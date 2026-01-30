@@ -19,25 +19,25 @@
     {
       "identifier": "apikey",
       "label": "OpenAI API Key",
-      "type": "string",
+      "type": "secret",
       "description": "Obtain an API key from: https://platform.openai.com/account/api-keys"
     },
     {
       "identifier": "claudeapikey",
       "label": "Claude API Key",
-      "type": "string",
+      "type": "secret",
       "description": "Obtain an API key from: https://console.anthropic.com/settings/keys"
     },
     {
       "identifier": "mistralapikey",
       "label": "Mistral API Key",
-      "type": "string",
+      "type": "secret",
       "description": "Obtain an API key from: https://console.mistral.ai/api-keys"
     },
     {
       "identifier": "geminiapikey",
       "label": "Gemini API Key",
-      "type": "string",
+      "type": "secret",
       "description": "Obtain a Gemini API key from: https://ai.google.dev"
     },
     {
@@ -74,30 +74,35 @@
       "identifier": "enable-improve-writing",
       "label": "Enable Improve Writing",
       "type": "boolean",
+      "defaultValue": true,
       "description": "Show or hide this action"
     },
     {
       "identifier": "enable-spelling-grammar",
       "label": "Enable Spelling & Grammar",
       "type": "boolean",
+      "defaultValue": true,
       "description": "Show or hide this action"
     },
     {
       "identifier": "enable-make-longer",
       "label": "Enable Make Longer",
       "type": "boolean",
+      "defaultValue": true,
       "description": "Show or hide this action"
     },
     {
       "identifier": "enable-make-shorter",
       "label": "Enable Make Shorter",
       "type": "boolean",
+      "defaultValue": true,
       "description": "Show or hide this action"
     },
     {
       "identifier": "enable-summarize",
       "label": "Enable Summarize",
       "type": "boolean",
+      "defaultValue": true,
       "description": "Show or hide this action"
     }
   ]

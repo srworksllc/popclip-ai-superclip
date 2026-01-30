@@ -27,17 +27,20 @@ popclip-ai-superclip/
 
 ### settings.js
 - Main extension code using PopClip's JavaScript API
-- Uses axios for HTTP requests
-- Contains prompt templates in the `PROMPTS` object
+- Uses axios for HTTP requests (30s timeout)
+- `SHARED_INSTRUCTIONS` object contains common prompt sections
+- `buildPrompt()` function assembles prompts from task + shared instructions
+- `PROMPTS` object contains task-specific prompts
+- `runAction()` generic handler with error handling and `popclip.showFailure()`
 - API functions: `callOpenAPI`, `callClaudeAPI`, `callMistralAPI`, `callGeminiAPI`
-- Action functions: `improveWritting`, `spellingAndGrammar`, `summarize`, `makeLonger`, `makeShorter`
+- Action functions: `improveWriting`, `spellingAndGrammar`, `summarize`, `makeLonger`, `makeShorter`
 - Exports actions array with title, icon, code, and requirements
 
 ## Available Actions
 
 | Action | Function | Icon |
 |--------|----------|------|
-| Improve Writing | `improveWritting` | sparkles |
+| Improve Writing | `improveWriting` | sparkles |
 | Correct Spelling & Grammar | `spellingAndGrammar` | check-circle |
 | Make Longer | `makeLonger` | plus-circle |
 | Make Shorter | `makeShorter` | minus-circle |
@@ -98,3 +101,157 @@ View logs in Console.app with filter: `Process:PopClip Category:Extension`
 
 ### Updating Prompts
 Edit the relevant prompt in the `PROMPTS` object. Follow the existing structure to maintain consistency.
+
+---
+
+## PopClip Extension Development Reference
+
+Documentation: https://www.popclip.app/dev/
+
+### Extension Formats
+- **Snippets**: Plain YAML text files for simple extensions
+- **Packages**: `.popclipext` folders with Config.json + resources (this project)
+
+### Config.json Structure
+
+**Required**: `name`
+
+**Common Fields**:
+| Field | Description |
+|-------|-------------|
+| `name` | Display name (localizable) |
+| `icon` | Icon specification |
+| `identifier` | Unique ID (alphanumerics, periods, hyphens) |
+| `description` | Short description (localizable) |
+| `popclipVersion` | Minimum PopClip build number |
+| `module` | JavaScript module file path |
+| `entitlements` | Array: `network`, `dynamic` |
+| `options` | Array of user-configurable options |
+| `actions` | Array of action definitions |
+
+### Option Types
+| Type | Description |
+|------|-------------|
+| `string` | Text input field |
+| `boolean` | Checkbox (default: false) |
+| `multiple` | Dropdown (requires `values` array) |
+| `secret` | Password field (stored in keychain) |
+| `heading` | Section header for grouping |
+
+**Option Properties**: `identifier` (required), `type` (required), `label`, `description`, `defaultValue`, `values`, `valueLabels`
+
+### Action Properties
+| Property | Description |
+|----------|-------------|
+| `title` | Button/tooltip text |
+| `icon` | Action icon (falls back to extension icon) |
+| `code` | JavaScript function `(input, options, context)` |
+| `requirements` | Array of conditions for visibility |
+| `regex` | RegExp for text matching |
+| `before` | Pre-action: `cut`, `copy`, `paste`, `paste-plain` |
+| `after` | Post-action: `copy-result`, `paste-result`, `show-result`, `show-status` |
+| `stayVisible` | Keep popup open after action |
+| `captureHtml` | Extract HTML/Markdown from selection |
+
+### Requirements Values
+- `text` - Requires text selection
+- `url` / `urls` - Requires URL in selection
+- `email` - Requires email address
+- `path` - Requires file path
+- `option-foo=1` - Requires option `foo` to be enabled
+
+### The `popclip` Global Object
+
+**Input Properties**:
+- `popclip.input.text` - Full selected text
+- `popclip.input.matchedText` - Text matching requirements/regex
+- `popclip.input.regexResult` - Regex capture groups
+- `popclip.input.html` - HTML content (if `captureHtml` enabled)
+- `popclip.input.markdown` - Markdown conversion (if `captureHtml` enabled)
+- `popclip.input.data.urls` - Detected URLs array
+
+**Context Properties**:
+- `popclip.context.browserUrl` - Current page URL
+- `popclip.context.browserTitle` - Current page title
+- `popclip.context.appName` - Active app name
+- `popclip.context.appIdentifier` - Active app bundle ID
+
+**Modifier Keys**:
+- `popclip.modifiers.shift` - Boolean
+- `popclip.modifiers.command` - Boolean
+- `popclip.modifiers.option` - Boolean
+- `popclip.modifiers.control` - Boolean
+
+**Methods**:
+- `popclip.pasteText(string)` - Paste text
+- `popclip.copyText(string)` - Copy to clipboard
+- `popclip.showText(string)` - Display in PopClip bar
+- `popclip.openUrl(url)` - Open URL
+- `popclip.pressKey(combo)` - Simulate key press
+- `popclip.performCommand(cmd)` - Execute cut/copy/paste
+- `popclip.showSuccess()` - Show checkmark
+- `popclip.showFailure()` - Show X mark
+- `popclip.showSettings()` - Open extension settings
+
+**Options Access**: `popclip.options.optionIdentifier`
+
+### Icon Formats
+- **Text**: Up to 3 characters (e.g., `"AI"`)
+- **SF Symbols**: `symbol:brain` (macOS 11+)
+- **Iconify**: `iconify:heroicons-solid:sparkles` (200k+ icons)
+- **File**: `file:icon.png` (PNG/SVG in package)
+- **SVG**: `svg:<svg>...</svg>`
+
+**Modifiers**: `square`, `circle`, `filled`, `flip-x`, `flip-y`, `scale=N`, `rotate=N`
+
+### Built-in Modules
+PopClip bundles these npm packages (use via `require()`):
+- `axios` (v1.12.2) - HTTP client
+- `js-yaml` (v4.1.0) - YAML parser
+- `sanitize-html` (v2.17.0) - HTML sanitizer
+- Plus 20+ others
+
+### Error Handling
+- Normal return = success
+- `throw new Error("message")` = failure
+- `throw new Error("Settings error: ...")` = opens settings UI
+- `throw new Error("Not signed in: ...")` = opens settings UI
+
+### Constraints
+- **Sandbox**: No filesystem access
+- **Network**: HTTPS only, requires `network` entitlement
+- **Language**: ES2023 supported
+
+---
+
+## Code Audit & Improvement Opportunities
+
+### Fixed Issues (January 2026)
+
+1. ~~**Typo**: `improveWritting` should be `improveWriting`~~ **FIXED**
+
+2. ~~**No error handling**: API calls have no try/catch~~ **FIXED** - Added `runAction()` with try/catch and `popclip.showFailure()`
+
+3. ~~**Boolean defaults**: All action toggles default to `false`~~ **FIXED** - Added `defaultValue: true` to all toggles
+
+4. ~~**Inconsistent `after` behavior**: Only `summarize` uses `after: "show-result"`~~ **FIXED** - Removed, all actions now paste consistently
+
+5. ~~**Code duplication**: All 5 action functions nearly identical~~ **FIXED** - Refactored to `runAction()` generic handler
+
+6. ~~**Repetitive prompts**: ~80% of prompt text duplicated~~ **FIXED** - Extracted to `SHARED_INSTRUCTIONS` and `buildPrompt()`
+
+7. ~~**API keys stored as plain text**~~ **FIXED** - Changed from `string` to `secret` type (stored in Keychain)
+
+8. ~~**No request timeout**~~ **FIXED** - Added 30s timeout to all axios requests
+
+### Future Improvements
+
+**Medium Priority**:
+- Add temperature option for controlling AI creativity
+- Add max_tokens option for output length control
+
+**Low Priority / Nice to Have**:
+- Add custom prompt action for power users
+- Use additional modifier keys (Option, Command) for different behaviors
+- Add `captureHtml` for markdown-aware processing
+- Add localization support for non-English users
