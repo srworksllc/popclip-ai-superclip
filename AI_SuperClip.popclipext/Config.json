@@ -63,6 +63,24 @@
         "gemini-2.5-flash",
         "gemini-2.0-flash"
       ],
+      "valueLabels": [
+        "OpenAI: GPT-4.1",
+        "OpenAI: GPT-4.1 Mini",
+        "OpenAI: GPT-4o",
+        "OpenAI: GPT-4o Mini",
+        "Claude: Opus 4.5",
+        "Claude: Sonnet 4.5",
+        "Claude: Sonnet 4",
+        "Claude: Haiku 4.5",
+        "Claude: Sonnet 3.5",
+        "Claude: Haiku 3.5",
+        "Mistral: Large",
+        "Mistral: Medium",
+        "Mistral: Small",
+        "Gemini: 2.5 Pro",
+        "Gemini: 2.5 Flash",
+        "Gemini: 2.0 Flash"
+      ],
       "description": "Select which AI model to use."
     },
     {

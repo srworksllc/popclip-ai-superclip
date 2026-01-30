@@ -256,30 +256,30 @@ exports.actions = [
     title: "Improve Writing",
     icon: "iconify:heroicons-solid:sparkles",
     code: improveWriting,
-    requirements: ["option-enable-improve-writing=1"]
+    requirements: ["text", "option-enable-improve-writing=1"]
   },
   {
     title: "Correct Spelling & Grammar",
     icon: "iconify:heroicons-solid:check-circle",
     code: spellingAndGrammar,
-    requirements: ["option-enable-spelling-grammar=1"]
+    requirements: ["text", "option-enable-spelling-grammar=1"]
   },
   {
     title: "Make Longer",
     icon: "iconify:heroicons-solid:plus-circle",
     code: makeLonger,
-    requirements: ["option-enable-make-longer=1"]
+    requirements: ["text", "option-enable-make-longer=1"]
   },
   {
     title: "Make Shorter",
     icon: "iconify:heroicons-solid:minus-circle",
     code: makeShorter,
-    requirements: ["option-enable-make-shorter=1"]
+    requirements: ["text", "option-enable-make-shorter=1"]
   },
   {
     title: "Summarize",
     icon: "iconify:heroicons-solid:list-bullet",
     code: summarize,
-    requirements: ["option-enable-summarize=1"]
+    requirements: ["text", "option-enable-summarize=1"]
   }
 ];
