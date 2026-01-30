@@ -107,31 +107,36 @@
       "identifier": "enable-improve-writing",
       "label": "Improve Writing",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "inset": true
     },
     {
       "identifier": "enable-spelling-grammar",
       "label": "Spelling & Grammar",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "inset": true
     },
     {
       "identifier": "enable-make-longer",
       "label": "Make Longer",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "inset": true
     },
     {
       "identifier": "enable-make-shorter",
       "label": "Make Shorter",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "inset": true
     },
     {
       "identifier": "enable-summarize",
       "label": "Summarize",
       "type": "boolean",
-      "defaultValue": true
+      "defaultValue": true,
+      "inset": true
     }
   ]
 }
