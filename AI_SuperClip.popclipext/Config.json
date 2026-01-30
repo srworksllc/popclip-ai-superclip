@@ -1,6 +1,6 @@
 {
   "name": "AI SuperClip",
-  "icon": "symbol:brain",
+  "icon": "iconify:mdi:head-lightbulb",
   "identifier": "com.srworks.popclip.extension.ai-superclip",
   "description": "Send the selected text to your preferred LLM and pastes the response. Hold Shift (⇧) to copy the response to the clipboard.",
   "note": "To use this extension you will need API keys from the respective providers",
