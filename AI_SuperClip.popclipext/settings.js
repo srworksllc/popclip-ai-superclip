@@ -55,77 +55,74 @@ function getMaxTokens(model) {
   return MODEL_MAX_TOKENS[model] || DEFAULT_MAX_TOKENS;
 }
 
-// Shared prompt instructions
-const SHARED_INSTRUCTIONS = {
-  outputFormat: `STEP 3: UNDERSTAND THE OUTPUT FORMAT
-- Do NOT add any introduction or explanation
-- Do NOT use markdown formatting (no bold, no italics, no headers, no bullets)
-- Do NOT use asterisks, underscores, or hashtags
-- Output ONLY plain text format
-- Start immediately with the first word of the content`,
-
-  punctuationRules: `STEP 4: FOLLOW THESE PUNCTUATION RULES (CHECK EACH ONE):
-- Never use em dashes (the long dash that looks like this: —)
-- Never use en dashes (the medium dash that looks like this: –)
-- Never use semicolons (;)
-- Only use hyphens when joining two words into one compound word (examples: "well-known" or "high-quality")
-- Do NOT use hyphens to replace dashes in sentences
-- Use only these punctuation marks: commas, periods, parentheses, colons
-- If you would normally use a dash, use a comma or period instead
-- If you would normally use a semicolon, split it into two sentences with a period`,
-
-  toneGuidelines: `STEP 5: APPLY THIS TONE (CHECK EACH ONE):
-- Approachable, confident, and grounded
-- Friendly and conversational but professional
-- Human and kind, not corporate or robotic
-- Confident but not cocky
-- Kind but not soft
-- Direct but not blunt
-- Professional but not formal
-- Conversational but not casual slang
-- If there's tension, diffuse it calmly and respectfully`,
-
-  verification: `STEP 6: BEFORE YOU RESPOND, VERIFY:
-- Did I remove ALL markdown formatting?
-- Did I remove ALL em dashes and en dashes?
-- Did I remove ALL semicolons?
-- Did I skip the preamble and start directly with the content?`
-};
-
-// Build a complete prompt with shared instructions
-function buildPrompt(task, outputNote = "") {
-  return `STEP 1: READ ALL INSTRUCTIONS BELOW BEFORE YOU START
-
-STEP 2: COMPLETE THE TASK
-${task}
-
-${SHARED_INSTRUCTIONS.outputFormat}${outputNote}
-
-${SHARED_INSTRUCTIONS.punctuationRules}
-
-${SHARED_INSTRUCTIONS.toneGuidelines}
-
-${SHARED_INSTRUCTIONS.verification}`;
-}
-
-// Prompt templates
+// Prompt templates for each action
 const PROMPTS = {
-  improveWriting: buildPrompt(
-    "Rewrite this text to improve clarity, flow, and impact while maintaining the original meaning."
-  ),
-  correctSpellingGrammar: buildPrompt(
-    "Fix all spelling and grammar errors in this text. Maintain the original style and tone."
-  ),
-  summarize: buildPrompt(
-    "Summarize the following content in a clear and concise way. Capture the main ideas, key points, and any important conclusions or action items. Keep the summary objective and easy to understand, regardless of the topic or audience.",
-    "\n- You MAY use bullets and outline format if it helps organize the key points"
-  ),
-  makeLonger: buildPrompt(
-    "Expand this text with additional detail, examples, and elaboration while maintaining the original tone and message."
-  ),
-  makeShorter: buildPrompt(
-    "Condense this text to its essential points while preserving the core message and tone."
-  )
+  improveWriting: `Rewrite the text below to improve clarity, flow, and impact. Keep the original meaning intact.
+
+RULES:
+1. Output ONLY the improved text. No preamble, no "Here's the improved version", no explanation.
+2. Start immediately with the first word of the rewritten content.
+3. NO markdown formatting. No bold, italics, headers, or bullet points.
+4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
+5. Only use hyphens for compound words like "well-known" or "high-quality".
+6. Match the original length approximately. Do not drastically shorten or lengthen.
+7. Preserve the author's voice. Make it clearer, not different.
+
+TEXT TO IMPROVE:`,
+
+  correctSpellingGrammar: `Fix all spelling and grammar errors in the text below. Do not change the meaning, style, or tone.
+
+RULES:
+1. Output ONLY the corrected text. No preamble, no "Here are the corrections", no explanation.
+2. Start immediately with the first word of the corrected content.
+3. NO markdown formatting. No bold, italics, headers, or bullet points.
+4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
+5. Only use hyphens for compound words like "well-known" or "high-quality".
+6. ONLY fix errors. Do not rephrase, reword, or "improve" the writing.
+7. If the text has no errors, return it exactly as provided.
+
+TEXT TO CORRECT:`,
+
+  summarize: `Summarize the text below. Extract the main ideas, key points, and any action items.
+
+RULES:
+1. Output ONLY the summary. No preamble, no "Here's a summary", no explanation.
+2. Start immediately with the first word of the summary.
+3. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
+4. Only use hyphens for compound words like "well-known" or "high-quality".
+5. Keep it concise. Aim for 20 to 30 percent of the original length.
+6. Use bullet points only if the content has multiple distinct topics or action items.
+7. Write in plain, objective language. No opinions or interpretations.
+
+TEXT TO SUMMARIZE:`,
+
+  makeLonger: `Expand the text below with more detail, examples, or elaboration. Keep the same tone and message.
+
+RULES:
+1. Output ONLY the expanded text. No preamble, no "Here's the longer version", no explanation.
+2. Start immediately with the first word of the expanded content.
+3. NO markdown formatting. No bold, italics, headers, or bullet points.
+4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
+5. Only use hyphens for compound words like "well-known" or "high-quality".
+6. Add substance, not fluff. Include relevant details, examples, or context.
+7. Roughly double the length, but prioritize quality over hitting a word count.
+8. Maintain the original voice and style.
+
+TEXT TO EXPAND:`,
+
+  makeShorter: `Condense the text below to its essential points. Preserve the core message and tone.
+
+RULES:
+1. Output ONLY the condensed text. No preamble, no "Here's the shorter version", no explanation.
+2. Start immediately with the first word of the condensed content.
+3. NO markdown formatting. No bold, italics, headers, or bullet points.
+4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
+5. Only use hyphens for compound words like "well-known" or "high-quality".
+6. Cut filler words, redundancies, and unnecessary qualifiers.
+7. Aim for roughly half the original length, but keep all essential information.
+8. Do not lose important details or change the meaning.
+
+TEXT TO CONDENSE:`
 };
 
 // Handle response based on modifier keys
