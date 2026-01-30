@@ -18,6 +18,11 @@ const RETRY_DELAY_MS = 1000;
 
 // Model-specific max_tokens configuration
 const MODEL_MAX_TOKENS = {
+  // Groq (free, fast)
+  "llama-3.3-70b-versatile": 8192,
+  "llama-3.1-8b-instant": 8192,
+  "mixtral-8x7b-32768": 8192,
+  "gemma2-9b-it": 8192,
   // OpenAI GPT-5.x (larger context, higher output)
   "gpt-5.2": 16384,
   "gpt-5.1": 16384,
@@ -172,9 +177,16 @@ function getErrorMessage(error) {
   return error.message || "An unexpected error occurred.";
 }
 
+// Check if model is a Groq model
+function isGroqModel(model) {
+  return model.startsWith("llama") || model.startsWith("mixtral") || model.startsWith("gemma");
+}
+
 // Route to appropriate API based on model
 async function callLLMapi(prompt, options) {
-  if (options.model.startsWith("gpt")) {
+  if (isGroqModel(options.model)) {
+    return await callGroqAPI(prompt, options);
+  } else if (options.model.startsWith("gpt")) {
     return await callOpenAPI(prompt, options);
   } else if (options.model.startsWith("claude")) {
     return await callClaudeAPI(prompt, options);
@@ -212,6 +224,31 @@ async function callWithRetry(apiFunction, prompt, options) {
   }
 
   throw lastError;
+}
+
+// --- GROQ API (Free, OpenAI-compatible)
+async function callGroqAPI(prompt, options) {
+  const key = options.groqapikey.trim();
+  if (!key || key.length === 0) {
+    throw new Error("Settings error: missing Groq API key. Get a free key at console.groq.com");
+  }
+
+  const { data } = await axios.post(
+    "https://api.groq.com/openai/v1/chat/completions",
+    {
+      model: options.model,
+      max_tokens: getMaxTokens(options.model),
+      messages: [{ role: "user", content: prompt }]
+    },
+    {
+      timeout: REQUEST_TIMEOUT,
+      headers: {
+        Authorization: `Bearer ${key}`,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+  return data.choices[0].message.content.trim();
 }
 
 // --- CLAUDE API

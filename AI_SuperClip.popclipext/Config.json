@@ -17,6 +17,12 @@
       "label": "API Keys"
     },
     {
+      "identifier": "groqapikey",
+      "label": "Groq (Free)",
+      "type": "secret",
+      "description": "console.groq.com/keys"
+    },
+    {
       "identifier": "apikey",
       "label": "OpenAI",
       "type": "secret",
@@ -49,8 +55,12 @@
       "identifier": "model",
       "label": "AI Model",
       "type": "multiple",
-      "defaultValue": "gpt-4.1",
+      "defaultValue": "llama-3.3-70b-versatile",
       "values": [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it",
         "gpt-5.2",
         "gpt-5.1",
         "gpt-4.1",
@@ -70,6 +80,10 @@
         "gemini-2.5-flash"
       ],
       "valueLabels": [
+        "Groq: Llama 3.3 70B (Free)",
+        "Groq: Llama 3.1 8B (Free, Fast)",
+        "Groq: Mixtral 8x7B (Free)",
+        "Groq: Gemma 2 9B (Free)",
         "OpenAI: GPT-5.2 (Latest)",
         "OpenAI: GPT-5.1",
         "OpenAI: GPT-4.1",
@@ -88,7 +102,7 @@
         "Gemini: 2.5 Pro",
         "Gemini: 2.5 Flash"
       ],
-      "description": "Only enter an API key for your selected provider"
+      "description": "Groq models are free. Get a key at console.groq.com"
     },
     {
       "identifier": "actions-heading",
