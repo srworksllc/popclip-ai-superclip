@@ -2,7 +2,7 @@
 
 A powerful PopClip extension that enhances your selected text using multiple AI providers.
 
-**Created by Steve Reinhardt | [SR Works LLC](https://srworks.io)**
+**Created by Steve Reinhardt | [SR Works LLC](https://srworks.co)**
 
 ## Features
 

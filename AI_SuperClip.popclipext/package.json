@@ -2,7 +2,7 @@
   "name": "AI_SuperClip.popclipext",
   "version": "1.0.0",
   "description": "PopClip LLM extension for text enhancement",
-  "author": "Steve Reinhardt <steve@srworks.io> (SR Works LLC)",
+  "author": "Steve Reinhardt <steve@srworks.co> (SR Works LLC)",
   "license": "MIT",
   "private": "true"
 }
