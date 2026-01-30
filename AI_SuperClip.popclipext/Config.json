@@ -47,13 +47,8 @@
       "description": "ai.google.dev"
     },
     {
-      "identifier": "model-heading",
-      "type": "heading",
-      "label": "Model"
-    },
-    {
       "identifier": "model",
-      "label": "AI Model",
+      "label": "Model",
       "type": "multiple",
       "defaultValue": "llama-3.3-70b-versatile",
       "values": [
@@ -101,8 +96,7 @@
         "Gemini: 3 Pro (Preview)",
         "Gemini: 2.5 Pro",
         "Gemini: 2.5 Flash"
-      ],
-      "description": "Groq models are free. Get a key at console.groq.com"
+      ]
     },
     {
       "identifier": "actions-heading",
