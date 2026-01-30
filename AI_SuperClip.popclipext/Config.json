@@ -1,0 +1,104 @@
+{
+  "name": "AI SuperClip",
+  "icon": "symbol:brain",
+  "identifier": "com.srworks.popclip.extension.ai-superclip",
+  "description": "Send the selected text to your preferred LLM and pastes the response. Hold Shift (⇧) to copy the response to the clipboard.",
+  "note": "To use this extension you will need API keys from the respective providers",
+  "author": "Steve Reinhardt",
+  "authorURL": "https://srworks.io",
+  "app": {
+    "name": "ChatGPT",
+    "link": "https://openai.com/blog/chatgpt"
+  },
+  "popclipVersion": 4069,
+  "module": "settings.js",
+  "entitlements": [
+    "network"
+  ],
+  "options": [
+    {
+      "identifier": "apikey",
+      "label": "OpenAI API Key",
+      "type": "string",
+      "description": "Obtain an API key from: https://platform.openai.com/account/api-keys"
+    },
+    {
+      "identifier": "claudeapikey",
+      "label": "Claude API Key",
+      "type": "string",
+      "description": "Obtain an API key from: https://console.anthropic.com/settings/keys"
+    },
+    {
+      "identifier": "mistralapikey",
+      "label": "Mistral API Key",
+      "type": "string",
+      "description": "Obtain an API key from: https://console.mistral.ai/api-keys"
+    },
+    {
+      "identifier": "geminiapikey",
+      "label": "Gemini API Key",
+      "type": "string",
+      "description": "Obtain a Gemini API key from: https://ai.google.dev"
+    },
+    {
+      "identifier": "model",
+      "label": "AI Model",
+      "type": "multiple",
+      "defaultValue": "gpt-4.1",
+      "values": [
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "gpt-4o",
+        "gpt-4o-mini",
+        "claude-opus-4-5-20251101",
+        "claude-sonnet-4-5-20250929",
+        "claude-sonnet-4-20250514",
+        "claude-haiku-4-5-20251001",
+        "claude-3-5-sonnet-20241022",
+        "claude-3-5-haiku-20241022",
+        "mistral-large-latest",
+        "mistral-medium-latest",
+        "mistral-small-latest",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash",
+        "gemini-2.0-flash"
+      ],
+      "description": "Select which AI model to use."
+    },
+    {
+      "identifier": "actions-heading",
+      "type": "heading",
+      "label": "Toggle which AI actions appear in PopClip"
+    },
+    {
+      "identifier": "enable-improve-writing",
+      "label": "Enable Improve Writing",
+      "type": "boolean",
+      "description": "Show or hide this action"
+    },
+    {
+      "identifier": "enable-spelling-grammar",
+      "label": "Enable Spelling & Grammar",
+      "type": "boolean",
+      "description": "Show or hide this action"
+    },
+    {
+      "identifier": "enable-make-longer",
+      "label": "Enable Make Longer",
+      "type": "boolean",
+      "description": "Show or hide this action"
+    },
+    {
+      "identifier": "enable-make-shorter",
+      "label": "Enable Make Shorter",
+      "type": "boolean",
+      "description": "Show or hide this action"
+    },
+    {
+      "identifier": "enable-summarize",
+      "label": "Enable Summarize",
+      "type": "boolean",
+      "description": "Show or hide this action"
+    }
+  ]
+}
