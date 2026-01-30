@@ -3,7 +3,6 @@
   "icon": "symbol:brain",
   "identifier": "com.srworks.popclip.extension.ai-superclip",
   "description": "Send the selected text to your preferred LLM and pastes the response. Hold Shift (⇧) to copy the response to the clipboard.",
-  "note": "To use this extension you will need API keys from the respective providers",
   "author": "Steve Reinhardt",
   "authorURL": "https://srworks.co",
   "popclipVersion": 4069,
@@ -13,28 +12,38 @@
   ],
   "options": [
     {
+      "identifier": "apikeys-heading",
+      "type": "heading",
+      "label": "API Keys"
+    },
+    {
       "identifier": "apikey",
-      "label": "OpenAI API Key",
+      "label": "OpenAI",
       "type": "secret",
-      "description": "Obtain an API key from: https://platform.openai.com/api-keys"
+      "description": "platform.openai.com/api-keys"
     },
     {
       "identifier": "claudeapikey",
-      "label": "Claude API Key",
+      "label": "Anthropic Claude",
       "type": "secret",
-      "description": "Obtain an API key from: https://console.anthropic.com/settings/keys"
+      "description": "console.anthropic.com/settings/keys"
     },
     {
       "identifier": "mistralapikey",
-      "label": "Mistral API Key",
+      "label": "Mistral",
       "type": "secret",
-      "description": "Obtain an API key from: https://console.mistral.ai/api-keys"
+      "description": "console.mistral.ai/api-keys"
     },
     {
       "identifier": "geminiapikey",
-      "label": "Gemini API Key",
+      "label": "Google Gemini",
       "type": "secret",
-      "description": "Obtain a Gemini API key from: https://ai.google.dev"
+      "description": "ai.google.dev"
+    },
+    {
+      "identifier": "model-heading",
+      "type": "heading",
+      "label": "Model"
     },
     {
       "identifier": "model",
@@ -79,47 +88,42 @@
         "Gemini: 2.5 Pro",
         "Gemini: 2.5 Flash"
       ],
-      "description": "Select which AI model to use."
+      "description": "Only enter an API key for your selected provider"
     },
     {
       "identifier": "actions-heading",
       "type": "heading",
-      "label": "Toggle which AI actions appear in PopClip"
+      "label": "Actions"
     },
     {
       "identifier": "enable-improve-writing",
-      "label": "Enable Improve Writing",
+      "label": "Improve Writing",
       "type": "boolean",
-      "defaultValue": true,
-      "description": "Show or hide this action"
+      "defaultValue": true
     },
     {
       "identifier": "enable-spelling-grammar",
-      "label": "Enable Spelling & Grammar",
+      "label": "Spelling & Grammar",
       "type": "boolean",
-      "defaultValue": true,
-      "description": "Show or hide this action"
+      "defaultValue": true
     },
     {
       "identifier": "enable-make-longer",
-      "label": "Enable Make Longer",
+      "label": "Make Longer",
       "type": "boolean",
-      "defaultValue": true,
-      "description": "Show or hide this action"
+      "defaultValue": true
     },
     {
       "identifier": "enable-make-shorter",
-      "label": "Enable Make Shorter",
+      "label": "Make Shorter",
       "type": "boolean",
-      "defaultValue": true,
-      "description": "Show or hide this action"
+      "defaultValue": true
     },
     {
       "identifier": "enable-summarize",
-      "label": "Enable Summarize",
+      "label": "Summarize",
       "type": "boolean",
-      "defaultValue": true,
-      "description": "Show or hide this action"
+      "defaultValue": true
     }
   ]
 }
