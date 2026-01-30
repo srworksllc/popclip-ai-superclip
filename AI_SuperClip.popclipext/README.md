@@ -44,8 +44,6 @@ A powerful PopClip extension that enhances your selected text using multiple AI 
 
 ## Configuration
 
-![Settings Screenshot](settings-screenshot.png)
-
 You need API keys from the providers you want to use. Get them here:
 
 - **OpenAI**: https://platform.openai.com/account/api-keys
