@@ -9,8 +9,46 @@
 
 const axios = require("axios");
 
-// Request timeout in milliseconds (30 seconds)
-const REQUEST_TIMEOUT = 30000;
+// Request timeout in milliseconds (60 seconds for larger models)
+const REQUEST_TIMEOUT = 60000;
+
+// Retry configuration
+const MAX_RETRIES = 1;
+const RETRY_DELAY_MS = 1000;
+
+// Model-specific max_tokens configuration
+const MODEL_MAX_TOKENS = {
+  // OpenAI GPT-5.x (larger context, higher output)
+  "gpt-5.2": 16384,
+  "gpt-5.1": 16384,
+  // OpenAI GPT-4.x
+  "gpt-4.1": 8192,
+  "gpt-4.1-mini": 8192,
+  "gpt-4o": 4096,
+  "gpt-4o-mini": 4096,
+  // Claude (all support high output)
+  "claude-opus-4-5-20251101": 8192,
+  "claude-sonnet-4-5-20250929": 8192,
+  "claude-sonnet-4-20250514": 8192,
+  "claude-haiku-4-5-20251001": 8192,
+  // Mistral
+  "mistral-large-latest": 8192,
+  "mistral-medium-latest": 4096,
+  "mistral-small-latest": 4096,
+  // Gemini
+  "gemini-3-flash-preview": 8192,
+  "gemini-3-pro-preview": 8192,
+  "gemini-2.5-pro": 8192,
+  "gemini-2.5-flash": 8192
+};
+
+// Default max_tokens if model not in config
+const DEFAULT_MAX_TOKENS = 4096;
+
+// Get max_tokens for a model
+function getMaxTokens(model) {
+  return MODEL_MAX_TOKENS[model] || DEFAULT_MAX_TOKENS;
+}
 
 // Shared prompt instructions
 const SHARED_INSTRUCTIONS = {
@@ -94,6 +132,46 @@ function prepareResponse(data) {
   }
 }
 
+// Sleep utility for retry delays
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Check if error is a rate limit (429) error
+function isRateLimitError(error) {
+  return error.response && error.response.status === 429;
+}
+
+// Check if error is retryable (network errors, 5xx, 429)
+function isRetryableError(error) {
+  if (!error.response) {
+    // Network error, timeout, etc.
+    return true;
+  }
+  const status = error.response.status;
+  return status === 429 || (status >= 500 && status < 600);
+}
+
+// Get user-friendly error message
+function getErrorMessage(error) {
+  if (isRateLimitError(error)) {
+    return "Rate limit exceeded. Please wait a moment and try again.";
+  }
+  if (!error.response) {
+    return "Network error. Please check your connection.";
+  }
+  if (error.response.status === 401) {
+    return "Invalid API key. Please check your settings.";
+  }
+  if (error.response.status === 403) {
+    return "Access denied. Please check your API key permissions.";
+  }
+  if (error.response.status >= 500) {
+    return "Server error. Please try again later.";
+  }
+  return error.message || "An unexpected error occurred.";
+}
+
 // Route to appropriate API based on model
 async function callLLMapi(prompt, options) {
   if (options.model.startsWith("gpt")) {
@@ -108,6 +186,34 @@ async function callLLMapi(prompt, options) {
   throw new Error("Unknown model selection: " + options.model);
 }
 
+// Wrapper with retry logic
+async function callWithRetry(apiFunction, prompt, options) {
+  let lastError;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await apiFunction(prompt, options);
+    } catch (error) {
+      lastError = error;
+
+      // Don't retry settings errors
+      if (error.message && error.message.toLowerCase().startsWith("settings error")) {
+        throw error;
+      }
+
+      // Don't retry if not retryable or on last attempt
+      if (!isRetryableError(error) || attempt === MAX_RETRIES) {
+        throw error;
+      }
+
+      // Wait before retrying (exponential backoff)
+      await sleep(RETRY_DELAY_MS * Math.pow(2, attempt));
+    }
+  }
+
+  throw lastError;
+}
+
 // --- CLAUDE API
 async function callClaudeAPI(prompt, options) {
   const key = options.claudeapikey.trim();
@@ -119,7 +225,7 @@ async function callClaudeAPI(prompt, options) {
     "https://api.anthropic.com/v1/messages",
     {
       model: options.model,
-      max_tokens: 2048,
+      max_tokens: getMaxTokens(options.model),
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -146,6 +252,7 @@ async function callOpenAPI(prompt, options) {
     "https://api.openai.com/v1/chat/completions",
     {
       model: options.model,
+      max_tokens: getMaxTokens(options.model),
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -169,7 +276,7 @@ async function callMistralAPI(prompt, options) {
     "https://api.mistral.ai/v1/chat/completions",
     {
       model: options.model,
-      max_tokens: 2048,
+      max_tokens: getMaxTokens(options.model),
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -198,7 +305,10 @@ async function callGeminiAPI(prompt, options) {
     {
       contents: [{
         parts: [{ text: prompt }]
-      }]
+      }],
+      generationConfig: {
+        maxOutputTokens: getMaxTokens(options.model)
+      }
     },
     {
       timeout: REQUEST_TIMEOUT,
@@ -213,20 +323,29 @@ async function callGeminiAPI(prompt, options) {
   return data.candidates[0].content.parts[0].text.trim();
 }
 
-// Generic action runner with error handling
+// Generic action runner with error handling and retry
 async function runAction(promptKey, input, options) {
   try {
     const prompt = PROMPTS[promptKey] + "\n\n" + input.text.trim();
-    const data = await callLLMapi(prompt, options);
+
+    // Use retry wrapper
+    const apiFunction = async (p, o) => callLLMapi(p, o);
+    const data = await callWithRetry(apiFunction, prompt, options);
+
     prepareResponse(data);
   } catch (error) {
     // Re-throw settings errors to trigger PopClip settings UI
     if (error.message && error.message.toLowerCase().startsWith("settings error")) {
       throw error;
     }
-    // Show failure indicator for other errors
+
+    // Show failure indicator
     popclip.showFailure();
-    throw error;
+
+    // Log detailed error for debugging
+    console.log("AI SuperClip Error:", getErrorMessage(error));
+
+    throw new Error(getErrorMessage(error));
   }
 }
 

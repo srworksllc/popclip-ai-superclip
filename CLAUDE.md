@@ -27,11 +27,15 @@ popclip-ai-superclip/
 
 ### settings.js
 - Main extension code using PopClip's JavaScript API
-- Uses axios for HTTP requests (30s timeout)
+- Uses axios for HTTP requests (60s timeout)
+- `MODEL_MAX_TOKENS` config for model-specific output limits
+- `callWithRetry()` wrapper with exponential backoff (1 retry)
+- `isRetryableError()` / `isRateLimitError()` for smart error handling
+- `getErrorMessage()` for user-friendly error messages
 - `SHARED_INSTRUCTIONS` object contains common prompt sections
 - `buildPrompt()` function assembles prompts from task + shared instructions
 - `PROMPTS` object contains task-specific prompts
-- `runAction()` generic handler with error handling and `popclip.showFailure()`
+- `runAction()` generic handler with error handling, retry, and `popclip.showFailure()`
 - API functions: `callOpenAPI`, `callClaudeAPI`, `callMistralAPI`, `callGeminiAPI`
 - Action functions: `improveWriting`, `spellingAndGrammar`, `summarize`, `makeLonger`, `makeShorter`
 - Exports actions array with title, icon, code, and requirements
@@ -46,12 +50,12 @@ popclip-ai-superclip/
 | Make Shorter | `makeShorter` | minus-circle |
 | Summarize | `summarize` | list-bullet |
 
-## Supported Models
+## Supported Models (Updated January 2026)
 
-- **OpenAI**: gpt-4.1, gpt-4.1-mini, gpt-4o, gpt-4o-mini
-- **Claude**: claude-opus-4-5-20251101, claude-sonnet-4-5-20250929, claude-sonnet-4-20250514, claude-haiku-4-5-20251001, claude-3-5-sonnet-20241022, claude-3-5-haiku-20241022
+- **OpenAI**: gpt-5.2, gpt-5.1, gpt-4.1, gpt-4.1-mini, gpt-4o, gpt-4o-mini
+- **Claude**: claude-opus-4-5-20251101, claude-sonnet-4-5-20250929, claude-sonnet-4-20250514, claude-haiku-4-5-20251001
 - **Mistral**: mistral-large-latest, mistral-medium-latest, mistral-small-latest
-- **Gemini**: gemini-2.5-pro, gemini-2.5-flash, gemini-2.0-flash
+- **Gemini**: gemini-3-flash-preview, gemini-3-pro-preview, gemini-2.5-pro, gemini-2.5-flash
 
 ## Development Notes
 

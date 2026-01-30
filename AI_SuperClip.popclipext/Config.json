@@ -6,10 +6,6 @@
   "note": "To use this extension you will need API keys from the respective providers",
   "author": "Steve Reinhardt",
   "authorURL": "https://srworks.co",
-  "app": {
-    "name": "ChatGPT",
-    "link": "https://openai.com/blog/chatgpt"
-  },
   "popclipVersion": 4069,
   "module": "settings.js",
   "entitlements": [
@@ -20,7 +16,7 @@
       "identifier": "apikey",
       "label": "OpenAI API Key",
       "type": "secret",
-      "description": "Obtain an API key from: https://platform.openai.com/account/api-keys"
+      "description": "Obtain an API key from: https://platform.openai.com/api-keys"
     },
     {
       "identifier": "claudeapikey",
@@ -46,6 +42,8 @@
       "type": "multiple",
       "defaultValue": "gpt-4.1",
       "values": [
+        "gpt-5.2",
+        "gpt-5.1",
         "gpt-4.1",
         "gpt-4.1-mini",
         "gpt-4o",
@@ -54,32 +52,32 @@
         "claude-sonnet-4-5-20250929",
         "claude-sonnet-4-20250514",
         "claude-haiku-4-5-20251001",
-        "claude-3-5-sonnet-20241022",
-        "claude-3-5-haiku-20241022",
         "mistral-large-latest",
         "mistral-medium-latest",
         "mistral-small-latest",
+        "gemini-3-flash-preview",
+        "gemini-3-pro-preview",
         "gemini-2.5-pro",
-        "gemini-2.5-flash",
-        "gemini-2.0-flash"
+        "gemini-2.5-flash"
       ],
       "valueLabels": [
+        "OpenAI: GPT-5.2 (Latest)",
+        "OpenAI: GPT-5.1",
         "OpenAI: GPT-4.1",
         "OpenAI: GPT-4.1 Mini",
         "OpenAI: GPT-4o",
         "OpenAI: GPT-4o Mini",
-        "Claude: Opus 4.5",
+        "Claude: Opus 4.5 (Best)",
         "Claude: Sonnet 4.5",
         "Claude: Sonnet 4",
-        "Claude: Haiku 4.5",
-        "Claude: Sonnet 3.5",
-        "Claude: Haiku 3.5",
-        "Mistral: Large",
-        "Mistral: Medium",
-        "Mistral: Small",
+        "Claude: Haiku 4.5 (Fast)",
+        "Mistral: Large 3",
+        "Mistral: Medium 3",
+        "Mistral: Small 3",
+        "Gemini: 3 Flash (Preview)",
+        "Gemini: 3 Pro (Preview)",
         "Gemini: 2.5 Pro",
-        "Gemini: 2.5 Flash",
-        "Gemini: 2.0 Flash"
+        "Gemini: 2.5 Flash"
       ],
       "description": "Select which AI model to use."
     },
