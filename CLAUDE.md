@@ -1,261 +1,284 @@
-# CLAUDE.md - Project Guide for AI Assistants
+# CLAUDE.md - AI SuperClip Developer Guide
 
-## Project Overview
+## Overview
 
-AI SuperClip is a PopClip extension that sends selected text to various LLM providers for text enhancement tasks. It supports OpenAI, Anthropic Claude, Mistral, and Google Gemini APIs.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 21 models, with Groq's free tier as the default.
+
+**Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
+**License:** MIT
+**PopClip Version:** 4069+
 
 ## Project Structure
 
 ```
 popclip-ai-superclip/
-└── AI_SuperClip.popclipext/    # PopClip extension bundle
-    ├── Config.json              # Extension configuration and options
-    ├── settings.js              # Main extension logic
-    ├── package.json             # NPM package metadata
-    ├── LICENSE                  # MIT License
-    └── README.md                # Extension documentation
+├── AI_SuperClip.popclipext/     # PopClip extension bundle
+│   ├── Config.json              # Extension metadata and options
+│   ├── settings.js              # Main extension logic (440 lines)
+│   ├── package.json             # NPM package metadata
+│   ├── LICENSE                  # MIT License
+│   └── README.md                # User documentation (bundle copy)
+├── CLAUDE.md                    # This file
+└── README.md                    # User documentation
 ```
 
-## Key Files
+## Actions
 
-### Config.json
-- Defines extension metadata (name, icon, identifier, author)
-- Declares API key options for each provider (OpenAI, Claude, Mistral, Gemini)
-- Lists available AI models in a dropdown
-- Toggle options for enabling/disabling each action
-- Requires `network` entitlement for API calls
+| Action | Prompt Key | Icon | Description |
+|--------|------------|------|-------------|
+| Improve Writing | `improveWriting` | sparkles | Enhance clarity and flow, preserve voice |
+| Spelling & Grammar | `correctSpellingGrammar` | check-circle | Fix errors only, no rewording |
+| Make Longer | `makeLonger` | plus-circle | Expand with detail, roughly double length |
+| Make Shorter | `makeShorter` | minus-circle | Condense to essentials, roughly half length |
+| Summarize | `summarize` | list-bullet | Extract key points, 20-30% of original |
 
-### settings.js
-- Main extension code using PopClip's JavaScript API
-- Uses axios for HTTP requests (60s timeout)
-- `MODEL_MAX_TOKENS` config for model-specific output limits
-- `callWithRetry()` wrapper with exponential backoff (1 retry)
-- `isRetryableError()` / `isRateLimitError()` for smart error handling
-- `getErrorMessage()` for user-friendly error messages
-- `SHARED_INSTRUCTIONS` object contains common prompt sections
-- `buildPrompt()` function assembles prompts from task + shared instructions
-- `PROMPTS` object contains task-specific prompts
-- `runAction()` generic handler with error handling, retry, and `popclip.showFailure()`
-- API functions: `callOpenAPI`, `callClaudeAPI`, `callMistralAPI`, `callGeminiAPI`
-- Action functions: `improveWriting`, `spellingAndGrammar`, `summarize`, `makeLonger`, `makeShorter`
-- Exports actions array with title, icon, code, and requirements
+**Modifier:** Hold Shift to copy instead of paste.
 
-## Available Actions
+## Supported Models
 
-| Action | Function | Icon |
-|--------|----------|------|
-| Improve Writing | `improveWriting` | sparkles |
-| Correct Spelling & Grammar | `spellingAndGrammar` | check-circle |
-| Make Longer | `makeLonger` | plus-circle |
-| Make Shorter | `makeShorter` | minus-circle |
-| Summarize | `summarize` | list-bullet |
+### Groq (Free)
+| Model ID | Label | Max Tokens |
+|----------|-------|------------|
+| `llama-3.3-70b-versatile` | Llama 3.3 70B (Default) | 8192 |
+| `llama-3.1-8b-instant` | Llama 3.1 8B (Fast) | 8192 |
+| `mixtral-8x7b-32768` | Mixtral 8x7B | 8192 |
+| `gemma2-9b-it` | Gemma 2 9B | 8192 |
 
-## Supported Models (Updated January 2026)
+### OpenAI (Paid)
+| Model ID | Label | Max Tokens |
+|----------|-------|------------|
+| `gpt-5.2` | GPT-5.2 (Latest) | 16384 |
+| `gpt-5.1` | GPT-5.1 | 16384 |
+| `gpt-4.1` | GPT-4.1 | 8192 |
+| `gpt-4.1-mini` | GPT-4.1 Mini | 8192 |
+| `gpt-4o` | GPT-4o | 4096 |
+| `gpt-4o-mini` | GPT-4o Mini | 4096 |
 
-- **OpenAI**: gpt-5.2, gpt-5.1, gpt-4.1, gpt-4.1-mini, gpt-4o, gpt-4o-mini
-- **Claude**: claude-opus-4-5-20251101, claude-sonnet-4-5-20250929, claude-sonnet-4-20250514, claude-haiku-4-5-20251001
-- **Mistral**: mistral-large-latest, mistral-medium-latest, mistral-small-latest
-- **Gemini**: gemini-3-flash-preview, gemini-3-pro-preview, gemini-2.5-pro, gemini-2.5-flash
+### Anthropic Claude (Paid)
+| Model ID | Label | Max Tokens |
+|----------|-------|------------|
+| `claude-opus-4-5-20251101` | Opus 4.5 (Best) | 8192 |
+| `claude-sonnet-4-5-20250929` | Sonnet 4.5 | 8192 |
+| `claude-sonnet-4-20250514` | Sonnet 4 | 8192 |
+| `claude-haiku-4-5-20251001` | Haiku 4.5 (Fast) | 8192 |
 
-## Development Notes
+### Mistral (Paid)
+| Model ID | Label | Max Tokens |
+|----------|-------|------------|
+| `mistral-large-latest` | Large 3 | 8192 |
+| `mistral-medium-latest` | Medium 3 | 4096 |
+| `mistral-small-latest` | Small 3 | 4096 |
 
-### PopClip Extension Format
-- Extension bundles use `.popclipext` folder extension
-- `Config.json` defines extension configuration
-- JavaScript modules are loaded via the `module` field
-- Icons use `iconify:` prefix for Iconify icons or `symbol:` for SF Symbols
+### Google Gemini (Free Tier)
+| Model ID | Label | Max Tokens |
+|----------|-------|------------|
+| `gemini-3-flash-preview` | 3 Flash (Preview) | 8192 |
+| `gemini-3-pro-preview` | 3 Pro (Preview) | 8192 |
+| `gemini-2.5-pro` | 2.5 Pro | 8192 |
+| `gemini-2.5-flash` | 2.5 Flash | 8192 |
+
+## Code Architecture
+
+### settings.js Structure
+
+```
+Lines 1-10      Header and imports (axios)
+Lines 12-56     Configuration constants
+                - REQUEST_TIMEOUT: 60000ms
+                - MAX_RETRIES: 1
+                - RETRY_DELAY_MS: 1000
+                - MODEL_MAX_TOKENS: per-model token limits
+                - getMaxTokens(): helper function
+
+Lines 58-126    PROMPTS object (5 prompt templates)
+
+Lines 128-175   Utility functions
+                - prepareResponse(): paste or copy based on Shift
+                - sleep(): delay for retries
+                - isRateLimitError(): check for 429
+                - isRetryableError(): network/5xx/429
+                - getErrorMessage(): user-friendly messages
+                - isGroqModel(): check if Groq model
+
+Lines 177-224   API routing and retry logic
+                - callLLMapi(): routes to correct provider
+                - callWithRetry(): exponential backoff wrapper
+
+Lines 226-359   Provider API functions
+                - callGroqAPI(): Groq (OpenAI-compatible)
+                - callClaudeAPI(): Anthropic
+                - callOpenAPI(): OpenAI
+                - callMistralAPI(): Mistral
+                - callGeminiAPI(): Google Gemini
+
+Lines 361-406   Action handlers
+                - runAction(): generic with error handling
+                - improveWriting(), spellingAndGrammar(),
+                  summarize(), makeLonger(), makeShorter()
+
+Lines 408-439   exports.actions array
+```
 
 ### API Endpoints
-- OpenAI: `https://api.openai.com/v1/chat/completions`
-- Claude: `https://api.anthropic.com/v1/messages`
-- Mistral: `https://api.mistral.ai/v1/chat/completions`
-- Gemini: `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent`
 
-### Prompt Design
-All prompts follow a consistent structure:
-1. Step-by-step instructions
-2. Output format rules (no preamble, no markdown)
-3. Punctuation rules (no em dashes, en dashes, semicolons)
-4. Tone guidelines (approachable, professional, human)
-5. Verification checklist
+| Provider | Endpoint |
+|----------|----------|
+| Groq | `https://api.groq.com/openai/v1/chat/completions` |
+| OpenAI | `https://api.openai.com/v1/chat/completions` |
+| Claude | `https://api.anthropic.com/v1/messages` |
+| Mistral | `https://api.mistral.ai/v1/chat/completions` |
+| Gemini | `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` |
 
-### Modifier Keys
-- Default: Paste response directly
-- Shift held: Copy response to clipboard instead
+### Error Handling
 
-### Debugging
+**Retry Logic:**
+- Retries on: Network errors, 429 (rate limit), 5xx (server errors)
+- Does NOT retry on: 401 (auth), 403 (forbidden), settings errors
+- Exponential backoff: 1s, 2s delay
+
+**Settings Errors:**
+- Messages starting with "Settings error:" trigger PopClip settings UI
+- Example: `throw new Error("Settings error: missing Groq API key")`
+
+**User Messages:**
+| Condition | Message |
+|-----------|---------|
+| 429 | "Rate limit exceeded. Please wait a moment and try again." |
+| Network | "Network error. Please check your connection." |
+| 401 | "Invalid API key. Please check your settings." |
+| 403 | "Access denied. Please check your API key permissions." |
+| 5xx | "Server error. Please try again later." |
+
+## Prompt Design
+
+All prompts follow consistent rules:
+1. Output ONLY the result (no preamble, explanations)
+2. Start immediately with first word of content
+3. NO markdown formatting (bold, italics, headers, bullets)
+4. NO em dashes, en dashes, or semicolons
+5. Only hyphens for compound words (well-known, high-quality)
+
+## Config.json Structure
+
+### Option Identifiers
+
+| Identifier | Type | Purpose |
+|------------|------|---------|
+| `groqapikey` | secret | Groq API key (Keychain) |
+| `apikey` | secret | OpenAI API key |
+| `claudeapikey` | secret | Anthropic API key |
+| `mistralapikey` | secret | Mistral API key |
+| `geminiapikey` | secret | Google Gemini API key |
+| `model` | multiple | Model selection dropdown |
+| `enable-improve-writing` | boolean | Toggle Improve Writing action |
+| `enable-spelling-grammar` | boolean | Toggle Spelling & Grammar action |
+| `enable-make-longer` | boolean | Toggle Make Longer action |
+| `enable-make-shorter` | boolean | Toggle Make Shorter action |
+| `enable-summarize` | boolean | Toggle Summarize action |
+
+### Action Requirements Format
+
+```javascript
+requirements: ["text", "option-enable-improve-writing=1"]
+```
+
+Requires text selection AND the toggle option enabled.
+
+## Common Tasks
+
+### Add a New Action
+
+1. Add prompt to `PROMPTS` object in settings.js
+2. Create action handler: `async function newAction(input, options) { await runAction("promptKey", input, options); }`
+3. Add to `exports.actions` array with title, icon, code, requirements
+4. Add toggle option in Config.json with `identifier`, `label`, `type: boolean`, `defaultValue: true`
+
+### Add a New Model
+
+1. Add model ID to `values` array in Config.json model option
+2. Add label to `valueLabels` array (same index)
+3. Add token limit to `MODEL_MAX_TOKENS` in settings.js
+4. If new provider: add API key option, implement `callXxxAPI()`, update `callLLMapi()` router
+
+### Update a Prompt
+
+Edit the relevant key in `PROMPTS` object. Follow existing structure:
+- Task description
+- RULES: numbered list
+- TEXT TO X: label for input
+
+## Debugging
+
 Enable debug mode:
 ```bash
 defaults write com.pilotmoon.popclip EnableExtensionDebug -bool YES
 ```
-View logs in Console.app with filter: `Process:PopClip Category:Extension`
 
-## Common Tasks
+View logs in Console.app:
+- Filter: `Process:PopClip Category:Extension`
+- Look for: `AI SuperClip Error:` messages
 
-### Adding a New Action
-1. Add prompt template to `PROMPTS` object in settings.js
-2. Create async action function that calls `callLLMapi` and `prepareResponse`
-3. Add action to `exports.actions` array with title, icon, code, requirements
-4. Add toggle option in Config.json under `options`
+Disable debug mode:
+```bash
+defaults delete com.pilotmoon.popclip EnableExtensionDebug
+```
 
-### Adding a New Model
-1. Add model ID to `values` array in the `model` option in Config.json
-2. If new provider, add API key option and implement new `callXxxAPI` function
-3. Update `callLLMapi` router function with new model prefix check
+## PopClip API Reference
 
-### Updating Prompts
-Edit the relevant prompt in the `PROMPTS` object. Follow the existing structure to maintain consistency.
+### popclip Global Object
 
----
+**Input:**
+- `popclip.input.text` - Selected text
+- `popclip.input.html` - HTML (if captureHtml enabled)
+- `popclip.input.markdown` - Markdown (if captureHtml enabled)
 
-## PopClip Extension Development Reference
-
-Documentation: https://www.popclip.app/dev/
-
-### Extension Formats
-- **Snippets**: Plain YAML text files for simple extensions
-- **Packages**: `.popclipext` folders with Config.json + resources (this project)
-
-### Config.json Structure
-
-**Required**: `name`
-
-**Common Fields**:
-| Field | Description |
-|-------|-------------|
-| `name` | Display name (localizable) |
-| `icon` | Icon specification |
-| `identifier` | Unique ID (alphanumerics, periods, hyphens) |
-| `description` | Short description (localizable) |
-| `popclipVersion` | Minimum PopClip build number |
-| `module` | JavaScript module file path |
-| `entitlements` | Array: `network`, `dynamic` |
-| `options` | Array of user-configurable options |
-| `actions` | Array of action definitions |
-
-### Option Types
-| Type | Description |
-|------|-------------|
-| `string` | Text input field |
-| `boolean` | Checkbox (default: false) |
-| `multiple` | Dropdown (requires `values` array) |
-| `secret` | Password field (stored in keychain) |
-| `heading` | Section header for grouping |
-
-**Option Properties**: `identifier` (required), `type` (required), `label`, `description`, `defaultValue`, `values`, `valueLabels`
-
-### Action Properties
-| Property | Description |
-|----------|-------------|
-| `title` | Button/tooltip text |
-| `icon` | Action icon (falls back to extension icon) |
-| `code` | JavaScript function `(input, options, context)` |
-| `requirements` | Array of conditions for visibility |
-| `regex` | RegExp for text matching |
-| `before` | Pre-action: `cut`, `copy`, `paste`, `paste-plain` |
-| `after` | Post-action: `copy-result`, `paste-result`, `show-result`, `show-status` |
-| `stayVisible` | Keep popup open after action |
-| `captureHtml` | Extract HTML/Markdown from selection |
-
-### Requirements Values
-- `text` - Requires text selection
-- `url` / `urls` - Requires URL in selection
-- `email` - Requires email address
-- `path` - Requires file path
-- `option-foo=1` - Requires option `foo` to be enabled
-
-### The `popclip` Global Object
-
-**Input Properties**:
-- `popclip.input.text` - Full selected text
-- `popclip.input.matchedText` - Text matching requirements/regex
-- `popclip.input.regexResult` - Regex capture groups
-- `popclip.input.html` - HTML content (if `captureHtml` enabled)
-- `popclip.input.markdown` - Markdown conversion (if `captureHtml` enabled)
-- `popclip.input.data.urls` - Detected URLs array
-
-**Context Properties**:
-- `popclip.context.browserUrl` - Current page URL
-- `popclip.context.browserTitle` - Current page title
-- `popclip.context.appName` - Active app name
-- `popclip.context.appIdentifier` - Active app bundle ID
-
-**Modifier Keys**:
+**Modifiers:**
 - `popclip.modifiers.shift` - Boolean
 - `popclip.modifiers.command` - Boolean
 - `popclip.modifiers.option` - Boolean
 - `popclip.modifiers.control` - Boolean
 
-**Methods**:
+**Methods:**
 - `popclip.pasteText(string)` - Paste text
 - `popclip.copyText(string)` - Copy to clipboard
-- `popclip.showText(string)` - Display in PopClip bar
-- `popclip.openUrl(url)` - Open URL
-- `popclip.pressKey(combo)` - Simulate key press
-- `popclip.performCommand(cmd)` - Execute cut/copy/paste
 - `popclip.showSuccess()` - Show checkmark
 - `popclip.showFailure()` - Show X mark
 - `popclip.showSettings()` - Open extension settings
 
-**Options Access**: `popclip.options.optionIdentifier`
+**Options:** `popclip.options.{identifier}`
 
 ### Icon Formats
-- **Text**: Up to 3 characters (e.g., `"AI"`)
-- **SF Symbols**: `symbol:brain` (macOS 11+)
-- **Iconify**: `iconify:heroicons-solid:sparkles` (200k+ icons)
-- **File**: `file:icon.png` (PNG/SVG in package)
-- **SVG**: `svg:<svg>...</svg>`
 
-**Modifiers**: `square`, `circle`, `filled`, `flip-x`, `flip-y`, `scale=N`, `rotate=N`
+- Text: `"AI"` (up to 3 chars)
+- SF Symbols: `symbol:brain`
+- Iconify: `iconify:heroicons-solid:sparkles`
+- File: `file:icon.png`
 
 ### Built-in Modules
-PopClip bundles these npm packages (use via `require()`):
+
+Available via `require()`:
 - `axios` (v1.12.2) - HTTP client
 - `js-yaml` (v4.1.0) - YAML parser
 - `sanitize-html` (v2.17.0) - HTML sanitizer
-- Plus 20+ others
-
-### Error Handling
-- Normal return = success
-- `throw new Error("message")` = failure
-- `throw new Error("Settings error: ...")` = opens settings UI
-- `throw new Error("Not signed in: ...")` = opens settings UI
 
 ### Constraints
-- **Sandbox**: No filesystem access
-- **Network**: HTTPS only, requires `network` entitlement
-- **Language**: ES2023 supported
+
+- Sandbox: No filesystem access
+- Network: HTTPS only, requires `network` entitlement
+- Language: ES2023 supported
+
+## Future Improvements
+
+**Medium Priority:**
+- Temperature option for AI creativity control
+- Max tokens option for output length control
+
+**Low Priority:**
+- Custom prompt action for power users
+- Additional modifier keys for different behaviors
+- HTML/Markdown capture with `captureHtml`
+- Localization support
 
 ---
 
-## Code Audit & Improvement Opportunities
-
-### Fixed Issues (January 2026)
-
-1. ~~**Typo**: `improveWritting` should be `improveWriting`~~ **FIXED**
-
-2. ~~**No error handling**: API calls have no try/catch~~ **FIXED** - Added `runAction()` with try/catch and `popclip.showFailure()`
-
-3. ~~**Boolean defaults**: All action toggles default to `false`~~ **FIXED** - Added `defaultValue: true` to all toggles
-
-4. ~~**Inconsistent `after` behavior**: Only `summarize` uses `after: "show-result"`~~ **FIXED** - Removed, all actions now paste consistently
-
-5. ~~**Code duplication**: All 5 action functions nearly identical~~ **FIXED** - Refactored to `runAction()` generic handler
-
-6. ~~**Repetitive prompts**: ~80% of prompt text duplicated~~ **FIXED** - Extracted to `SHARED_INSTRUCTIONS` and `buildPrompt()`
-
-7. ~~**API keys stored as plain text**~~ **FIXED** - Changed from `string` to `secret` type (stored in Keychain)
-
-8. ~~**No request timeout**~~ **FIXED** - Added 30s timeout to all axios requests
-
-### Future Improvements
-
-**Medium Priority**:
-- Add temperature option for controlling AI creativity
-- Add max_tokens option for output length control
-
-**Low Priority / Nice to Have**:
-- Add custom prompt action for power users
-- Use additional modifier keys (Option, Command) for different behaviors
-- Add `captureHtml` for markdown-aware processing
-- Add localization support for non-English users
+PopClip Documentation: https://www.popclip.app/dev/

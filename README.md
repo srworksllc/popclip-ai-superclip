@@ -24,8 +24,8 @@ A PopClip extension that enhances your selected text using AI. Select text, clic
 
 | Provider | Models | Pricing |
 |----------|--------|---------|
-| **Groq** | Llama 3.3 70B, Llama 3.1 8B, Mixtral, Gemma 2 | Free |
-| **OpenAI** | GPT-5.2, GPT-5.1, GPT-4.1, GPT-4o | Paid |
+| **Groq** | Llama 3.3 70B, Llama 3.1 8B, Mixtral 8x7B, Gemma 2 9B | Free |
+| **OpenAI** | GPT-5.2, GPT-5.1, GPT-4.1, GPT-4.1 Mini, GPT-4o, GPT-4o Mini | Paid |
 | **Anthropic** | Claude Opus 4.5, Sonnet 4.5, Sonnet 4, Haiku 4.5 | Paid |
 | **Mistral** | Large 3, Medium 3, Small 3 | Paid |
 | **Google** | Gemini 3 Flash, 3 Pro, 2.5 Pro, 2.5 Flash | Free tier |
@@ -61,7 +61,7 @@ Double-click the `AI_SuperClip.popclipext` folder to install.
 
 ## Configuration
 
-Open PopClip menu bar icon → Click the gear on AI SuperClip.
+Open PopClip menu bar icon, then click the gear on AI SuperClip.
 
 ### API Keys
 
@@ -91,7 +91,7 @@ Enable debug mode:
 defaults write com.pilotmoon.popclip EnableExtensionDebug -bool YES
 ```
 
-View logs in **Console.app** → Filter: `Process:PopClip Category:Extension`
+View logs in **Console.app** with filter: `Process:PopClip Category:Extension`
 
 ## License
 
