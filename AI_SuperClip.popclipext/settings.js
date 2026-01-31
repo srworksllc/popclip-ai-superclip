@@ -338,6 +338,7 @@ async function callGeminiAPI(prompt, options) {
     url,
     {
       contents: [{
+        role: "user",
         parts: [{ text: prompt }]
       }],
       generationConfig: {
