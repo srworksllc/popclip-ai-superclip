@@ -13,8 +13,8 @@ const axios = require("axios");
 const REQUEST_TIMEOUT = 60000;
 
 // Retry configuration
-const MAX_RETRIES = 1;
-const RETRY_DELAY_MS = 1000;
+const MAX_RETRIES = 2;
+const RETRY_DELAY_MS = 500;
 
 // Model-specific max_tokens configuration
 const MODEL_MAX_TOKENS = {
