@@ -1,5 +1,14 @@
 # CLAUDE.md - AI SuperClip Developer Guide
 
+## Repository Info
+
+| Property | Value |
+|----------|-------|
+| **GitHub** | `srworksllc/popclip-ai-superclip` |
+| **Local Path** | `/Users/stephenreinhardt/Sites/popclip-ai-superclip` |
+| **Type** | PopClip extension (macOS) |
+| **Extension** | `AI_SuperClip.popclipext` |
+
 ## Overview
 
 AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 21 models, with Groq's free tier as the default.
