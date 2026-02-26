@@ -11,7 +11,7 @@
 
 ## Overview
 
-AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 21 models, with Groq's free tier as the default.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 20 models, with Groq's Llama 4 Maverick as the default.
 
 **Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
 **License:** MIT
@@ -48,27 +48,25 @@ popclip-ai-superclip/
 ### Groq (Free)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `llama-3.3-70b-versatile` | Llama 3.3 70B (Default) | 8192 |
+| `meta-llama/llama-4-maverick-17b-128e-instruct` | Llama 4 Maverick (Default) | 8192 |
+| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
+| `llama-3.3-70b-versatile` | Llama 3.3 70B | 8192 |
 | `llama-3.1-8b-instant` | Llama 3.1 8B (Fast) | 8192 |
-| `mixtral-8x7b-32768` | Mixtral 8x7B | 8192 |
-| `gemma2-9b-it` | Gemma 2 9B | 8192 |
 
 ### OpenAI (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `gpt-5.2` | GPT-5.2 (Latest) | 16384 |
-| `gpt-5.1` | GPT-5.1 | 16384 |
 | `gpt-4.1` | GPT-4.1 | 8192 |
 | `gpt-4.1-mini` | GPT-4.1 Mini | 8192 |
-| `gpt-4o` | GPT-4o | 4096 |
-| `gpt-4o-mini` | GPT-4o Mini | 4096 |
+| `gpt-4.1-nano` | GPT-4.1 Nano | 8192 |
+| `o3` | o3 (Reasoning) | 16384 |
+| `o4-mini` | o4 Mini (Reasoning) | 16384 |
 
 ### Anthropic Claude (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `claude-opus-4-5-20251101` | Opus 4.5 (Best) | 8192 |
-| `claude-sonnet-4-5-20250929` | Sonnet 4.5 | 8192 |
-| `claude-sonnet-4-20250514` | Sonnet 4 | 8192 |
+| `claude-opus-4-6` | Opus 4.6 (Best) | 8192 |
+| `claude-sonnet-4-6` | Sonnet 4.6 | 8192 |
 | `claude-haiku-4-5-20251001` | Haiku 4.5 (Fast) | 8192 |
 
 ### Mistral (Paid)
@@ -81,10 +79,11 @@ popclip-ai-superclip/
 ### Google Gemini (Free Tier)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
+| `gemini-3.1-pro-preview` | 3.1 Pro (Preview) | 8192 |
 | `gemini-3-flash-preview` | 3 Flash (Preview) | 8192 |
-| `gemini-3-pro-preview` | 3 Pro (Preview) | 8192 |
 | `gemini-2.5-pro` | 2.5 Pro | 8192 |
 | `gemini-2.5-flash` | 2.5 Flash | 8192 |
+| `gemini-2.5-flash-lite` | 2.5 Flash Lite | 4096 |
 
 ## Code Architecture
 
@@ -94,8 +93,8 @@ popclip-ai-superclip/
 Lines 1-10      Header and imports (axios)
 Lines 12-56     Configuration constants
                 - REQUEST_TIMEOUT: 60000ms
-                - MAX_RETRIES: 1
-                - RETRY_DELAY_MS: 1000
+                - MAX_RETRIES: 2
+                - RETRY_DELAY_MS: 500
                 - MODEL_MAX_TOKENS: per-model token limits
                 - getMaxTokens(): helper function
 
@@ -143,7 +142,7 @@ Lines 408-439   exports.actions array
 **Retry Logic:**
 - Retries on: Network errors, 429 (rate limit), 5xx (server errors)
 - Does NOT retry on: 401 (auth), 403 (forbidden), settings errors
-- Exponential backoff: 1s, 2s delay
+- Exponential backoff: 500ms, 1s delay
 
 **Settings Errors:**
 - Messages starting with "Settings error:" trigger PopClip settings UI
@@ -166,6 +165,8 @@ All prompts follow consistent rules:
 3. NO markdown formatting (bold, italics, headers, bullets)
 4. NO em dashes, en dashes, or semicolons
 5. Only hyphens for compound words (well-known, high-quality)
+6. Writing prompts (Improve, Make Longer, Make Shorter) enforce a natural, casual, human tone with contractions and short sentences
+7. Spelling & Grammar prompt also fixes capitalization (lowercase input → proper English capitalization)
 
 ## Config.json Structure
 
