@@ -1,6 +1,6 @@
 {
   "name": "AI SuperClip",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "icon": "symbol:brain",
   "identifier": "com.srworks.popclip.extension.ai-superclip",
   "description": "Send the selected text to your preferred LLM and pastes the response. Hold Shift (⇧) to copy the response to the clipboard.",
@@ -51,52 +51,50 @@
       "identifier": "model",
       "label": "Model",
       "type": "multiple",
-      "defaultValue": "llama-3.3-70b-versatile",
+      "defaultValue": "meta-llama/llama-4-maverick-17b-128e-instruct",
       "values": [
+        "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "meta-llama/llama-4-scout-17b-16e-instruct",
         "llama-3.3-70b-versatile",
         "llama-3.1-8b-instant",
-        "mixtral-8x7b-32768",
-        "gemma2-9b-it",
-        "gpt-5.2",
-        "gpt-5.1",
         "gpt-4.1",
         "gpt-4.1-mini",
-        "gpt-4o",
-        "gpt-4o-mini",
-        "claude-opus-4-5-20251101",
-        "claude-sonnet-4-5-20250929",
-        "claude-sonnet-4-20250514",
+        "gpt-4.1-nano",
+        "o3",
+        "o4-mini",
+        "claude-opus-4-6",
+        "claude-sonnet-4-6",
         "claude-haiku-4-5-20251001",
         "mistral-large-latest",
         "mistral-medium-latest",
         "mistral-small-latest",
+        "gemini-3.1-pro-preview",
         "gemini-3-flash-preview",
-        "gemini-3-pro-preview",
         "gemini-2.5-pro",
-        "gemini-2.5-flash"
+        "gemini-2.5-flash",
+        "gemini-2.5-flash-lite"
       ],
       "valueLabels": [
+        "Groq: Llama 4 Maverick (Free)",
+        "Groq: Llama 4 Scout (Free)",
         "Groq: Llama 3.3 70B (Free)",
         "Groq: Llama 3.1 8B (Free, Fast)",
-        "Groq: Mixtral 8x7B (Free)",
-        "Groq: Gemma 2 9B (Free)",
-        "OpenAI: GPT-5.2 (Latest)",
-        "OpenAI: GPT-5.1",
         "OpenAI: GPT-4.1",
         "OpenAI: GPT-4.1 Mini",
-        "OpenAI: GPT-4o",
-        "OpenAI: GPT-4o Mini",
-        "Claude: Opus 4.5 (Best)",
-        "Claude: Sonnet 4.5",
-        "Claude: Sonnet 4",
+        "OpenAI: GPT-4.1 Nano",
+        "OpenAI: o3 (Reasoning)",
+        "OpenAI: o4 Mini (Reasoning)",
+        "Claude: Opus 4.6 (Best)",
+        "Claude: Sonnet 4.6",
         "Claude: Haiku 4.5 (Fast)",
         "Mistral: Large 3",
         "Mistral: Medium 3",
         "Mistral: Small 3",
+        "Gemini: 3.1 Pro (Preview)",
         "Gemini: 3 Flash (Preview)",
-        "Gemini: 3 Pro (Preview)",
         "Gemini: 2.5 Pro",
-        "Gemini: 2.5 Flash"
+        "Gemini: 2.5 Flash",
+        "Gemini: 2.5 Flash Lite"
       ]
     },
     {
@@ -142,7 +140,7 @@
     {
       "identifier": "version-heading",
       "type": "heading",
-      "label": "Version 1.0.3"
+      "label": "Version 1.1.0"
     }
   ]
 }

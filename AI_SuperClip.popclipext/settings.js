@@ -19,32 +19,30 @@ const RETRY_DELAY_MS = 500;
 // Model-specific max_tokens configuration
 const MODEL_MAX_TOKENS = {
   // Groq (free, fast)
+  "meta-llama/llama-4-maverick-17b-128e-instruct": 8192,
+  "meta-llama/llama-4-scout-17b-16e-instruct": 8192,
   "llama-3.3-70b-versatile": 8192,
   "llama-3.1-8b-instant": 8192,
-  "mixtral-8x7b-32768": 8192,
-  "gemma2-9b-it": 8192,
-  // OpenAI GPT-5.x (larger context, higher output)
-  "gpt-5.2": 16384,
-  "gpt-5.1": 16384,
-  // OpenAI GPT-4.x
+  // OpenAI
   "gpt-4.1": 8192,
   "gpt-4.1-mini": 8192,
-  "gpt-4o": 4096,
-  "gpt-4o-mini": 4096,
-  // Claude (all support high output)
-  "claude-opus-4-5-20251101": 8192,
-  "claude-sonnet-4-5-20250929": 8192,
-  "claude-sonnet-4-20250514": 8192,
+  "gpt-4.1-nano": 8192,
+  "o3": 16384,
+  "o4-mini": 16384,
+  // Claude
+  "claude-opus-4-6": 8192,
+  "claude-sonnet-4-6": 8192,
   "claude-haiku-4-5-20251001": 8192,
   // Mistral
   "mistral-large-latest": 8192,
   "mistral-medium-latest": 4096,
   "mistral-small-latest": 4096,
   // Gemini
+  "gemini-3.1-pro-preview": 8192,
   "gemini-3-flash-preview": 8192,
-  "gemini-3-pro-preview": 8192,
   "gemini-2.5-pro": 8192,
-  "gemini-2.5-flash": 8192
+  "gemini-2.5-flash": 8192,
+  "gemini-2.5-flash-lite": 4096
 };
 
 // Default max_tokens if model not in config
@@ -70,7 +68,7 @@ RULES:
 
 TEXT TO IMPROVE:`,
 
-  correctSpellingGrammar: `Fix all spelling and grammar errors in the text below. Do not change the meaning, style, or tone.
+  correctSpellingGrammar: `Fix all spelling, grammar, and capitalization errors in the text below. Do not change the meaning, style, or tone.
 
 RULES:
 1. Output ONLY the corrected text. No preamble, no "Here are the corrections", no explanation.
@@ -80,6 +78,7 @@ RULES:
 5. Only use hyphens for compound words like "well-known" or "high-quality".
 6. ONLY fix errors. Do not rephrase, reword, or "improve" the writing.
 7. If the text has no errors, return it exactly as provided.
+8. ALWAYS fix capitalization: capitalize the first word of every sentence, proper nouns, and "I". The input may be written in all lowercase. Correct it to standard English capitalization.
 
 TEXT TO CORRECT:`,
 
@@ -176,14 +175,14 @@ function getErrorMessage(error) {
 
 // Check if model is a Groq model
 function isGroqModel(model) {
-  return model.startsWith("llama") || model.startsWith("mixtral") || model.startsWith("gemma");
+  return model.startsWith("llama") || model.startsWith("meta-llama/");
 }
 
 // Route to appropriate API based on model
 async function callLLMapi(prompt, options) {
   if (isGroqModel(options.model)) {
     return await callGroqAPI(prompt, options);
-  } else if (options.model.startsWith("gpt")) {
+  } else if (options.model.startsWith("gpt") || options.model.startsWith("o3") || options.model.startsWith("o4")) {
     return await callOpenAPI(prompt, options);
   } else if (options.model.startsWith("claude")) {
     return await callClaudeAPI(prompt, options);
@@ -282,13 +281,20 @@ async function callOpenAPI(prompt, options) {
     throw new Error("Settings error: missing OpenAI API key");
   }
 
+  const isReasoning = options.model.startsWith("o3") || options.model.startsWith("o4");
+  const body = {
+    model: options.model,
+    messages: [{ role: "user", content: prompt }]
+  };
+  if (isReasoning) {
+    body.max_completion_tokens = getMaxTokens(options.model);
+  } else {
+    body.max_tokens = getMaxTokens(options.model);
+  }
+
   const { data } = await axios.post(
     "https://api.openai.com/v1/chat/completions",
-    {
-      model: options.model,
-      max_tokens: getMaxTokens(options.model),
-      messages: [{ role: "user", content: prompt }]
-    },
+    body,
     {
       timeout: REQUEST_TIMEOUT,
       headers: {
