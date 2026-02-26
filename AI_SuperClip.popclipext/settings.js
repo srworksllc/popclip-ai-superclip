@@ -65,6 +65,8 @@ RULES:
 5. Only use hyphens for compound words like "well-known" or "high-quality".
 6. Match the original length approximately. Do not drastically shorten or lengthen.
 7. Preserve the author's voice. Make it clearer, not different.
+8. Write like a real person. Keep the tone natural, slightly casual, and conversational. Avoid stiff, corporate, or overly polished language. It should sound like someone actually wrote it, not like AI generated it.
+9. Prefer short, punchy sentences. Use contractions (don't, it's, won't). Avoid filler phrases and hedging words like "essentially", "basically", "in order to", "it should be noted that".
 
 TEXT TO IMPROVE:`,
 
@@ -106,6 +108,7 @@ RULES:
 6. Add substance, not fluff. Include relevant details, examples, or context.
 7. Roughly double the length, but prioritize quality over hitting a word count.
 8. Maintain the original voice and style.
+9. Write like a real person. Keep the tone natural, slightly casual, and conversational. The expanded text should sound handwritten, not AI generated. Use contractions and short sentences where they fit.
 
 TEXT TO EXPAND:`,
 
@@ -120,6 +123,7 @@ RULES:
 6. Cut filler words, redundancies, and unnecessary qualifiers.
 7. Aim for roughly half the original length, but keep all essential information.
 8. Do not lose important details or change the meaning.
+9. Keep it sounding natural and human. Use contractions. Favor direct, casual phrasing over formal or corporate language.
 
 TEXT TO CONDENSE:`
 };
