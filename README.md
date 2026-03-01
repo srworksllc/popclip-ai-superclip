@@ -34,7 +34,7 @@ Tone does not apply to Spelling & Grammar or Summarize.
 - Plain text output (no markdown or special formatting)
 - Automatic retry on network errors
 - Toggle individual actions on/off in settings
-- 9 models across 5 providers — switch anytime in settings
+- 10 models across 5 providers — switch anytime in settings
 
 ## Supported Models
 

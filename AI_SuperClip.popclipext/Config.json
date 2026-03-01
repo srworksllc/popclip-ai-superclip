@@ -59,7 +59,8 @@
         "gpt-4.1-mini",
         "claude-sonnet-4-6",
         "claude-haiku-4-5-20251001",
-        "mistral-large-latest",
+        "mistral-medium-latest",
+        "mistral-small-latest",
         "gemini-2.5-pro",
         "gemini-2.5-flash"
       ],
@@ -70,7 +71,8 @@
         "OpenAI: GPT-4.1 Mini",
         "Claude: Sonnet 4.6",
         "Claude: Haiku 4.5 (Fast)",
-        "Mistral: Large",
+        "Mistral: Medium",
+        "Mistral: Small (Fast)",
         "Gemini: 2.5 Pro",
         "Gemini: 2.5 Flash"
       ]

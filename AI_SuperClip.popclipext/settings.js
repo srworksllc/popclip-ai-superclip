@@ -28,7 +28,8 @@ const MODEL_MAX_TOKENS = {
   "claude-sonnet-4-6": 8192,
   "claude-haiku-4-5-20251001": 8192,
   // Mistral
-  "mistral-large-latest": 8192,
+  "mistral-medium-latest": 8192,
+  "mistral-small-latest": 8192,
   // Gemini
   "gemini-2.5-pro": 8192,
   "gemini-2.5-flash": 8192

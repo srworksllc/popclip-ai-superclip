@@ -11,7 +11,7 @@
 
 ## Overview
 
-AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 9 models, with Groq's Llama 4 Maverick as the default.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 10 models, with Groq's Llama 4 Maverick as the default.
 
 **Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
 **License:** MIT
@@ -66,7 +66,8 @@ popclip-ai-superclip/
 ### Mistral (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `mistral-large-latest` | Large | 8192 |
+| `mistral-medium-latest` | Medium | 8192 |
+| `mistral-small-latest` | Small (Fast) | 8192 |
 
 ### Google Gemini (Free Tier)
 | Model ID | Label | Max Tokens |
@@ -84,7 +85,7 @@ Lines 12-43     Configuration constants
                 - REQUEST_TIMEOUT: 60000ms
                 - MAX_RETRIES: 2
                 - RETRY_DELAY_MS: 500
-                - MODEL_MAX_TOKENS: per-model token limits (9 models)
+                - MODEL_MAX_TOKENS: per-model token limits (10 models)
                 - getMaxTokens(): helper function
 
 Lines 45-111    PROMPTS object (5 prompt templates)
@@ -199,7 +200,9 @@ Requires text selection AND the toggle option enabled.
 1. Add model ID to `values` array in Config.json model option
 2. Add label to `valueLabels` array (same index)
 3. Add token limit to `MODEL_MAX_TOKENS` in settings.js
-4. If new provider: add API key option, implement `callXxxAPI()`, update `callLLMapi()` router
+4. If new provider: add API key option, implement `callXxxAPI()`, update `callLLMapi()` router, add provider to `PROVIDERS` list in release.sh doc sync
+
+CLAUDE.md and README.md model tables/counts are auto-synced from Config.json at release time (Step 2 of release.sh).
 
 ### Update a Prompt
 
@@ -207,6 +210,30 @@ Edit the relevant key in `PROMPTS` object. Follow existing structure:
 - Task description
 - RULES: numbered list
 - TEXT TO X: label for input
+
+## Release Process
+
+```bash
+./release.sh 1.2.0
+```
+
+**Steps:**
+
+| Step | Action |
+|------|--------|
+| 1 | Version bump (Config.json, package.json) |
+| 2 | Sync docs — auto-updates model tables/counts in CLAUDE.md and README.md (both copies) from Config.json + settings.js |
+| 3 | Build ZIP (`.popclipextz`) |
+| 4 | Git commit + tag (includes Config.json, package.json, CLAUDE.md, README.md x2) |
+| 5 | Push to GitHub |
+| 6 | Create GitHub release with ZIP attached |
+| 7 | Cleanup (remove local ZIP) |
+
+**Doc sync (Step 2) auto-updates:**
+- Model count in CLAUDE.md overview and code architecture section
+- Full model tables in CLAUDE.md (grouped by provider with token limits)
+- Model count and summary table in both READMEs
+- Provider grouping is defined in the `PROVIDERS` list inside release.sh
 
 ## Debugging
 

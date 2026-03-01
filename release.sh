@@ -109,10 +109,164 @@ with open('$PACKAGE_FILE', 'w') as f:
 echo "  Config.json  → $NEW_VERSION"
 echo "  package.json → $NEW_VERSION"
 
-# ── Step 2: Build ZIP ────────────────────────────────────────────────
+# ── Step 2: Sync documentation ───────────────────────────────────
 
 echo ""
-echo "Step 2: Building $ZIP_NAME..."
+echo "Step 2: Syncing docs from Config.json..."
+
+python3 << 'PYEOF'
+import json, re, os
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath("release.sh")) or "."
+EXT_DIR = os.path.join(SCRIPT_DIR, "AI_SuperClip.popclipext")
+CONFIG = os.path.join(EXT_DIR, "Config.json")
+SETTINGS = os.path.join(EXT_DIR, "settings.js")
+CLAUDE_MD = os.path.join(SCRIPT_DIR, "CLAUDE.md")
+README = os.path.join(SCRIPT_DIR, "README.md")
+BUNDLE_README = os.path.join(EXT_DIR, "README.md")
+
+# ── Parse Config.json ──
+
+with open(CONFIG) as f:
+    config = json.load(f)
+
+model_opt = next(o for o in config["options"] if o.get("identifier") == "model")
+model_ids = model_opt["values"]
+model_labels = model_opt["valueLabels"]
+model_count = len(model_ids)
+
+# ── Parse token limits from settings.js ──
+
+with open(SETTINGS) as f:
+    settings_src = f.read()
+
+tokens = {}
+for mid in model_ids:
+    m = re.search(re.escape(f'"{mid}"') + r'\s*:\s*(\d+)', settings_src)
+    tokens[mid] = int(m.group(1)) if m else 4096
+
+# ── Provider grouping (order matters) ──
+
+PROVIDERS = [
+    {"prefix": ["meta-llama/", "llama"], "name": "Groq", "tier": "Free",      "readme_tier": "Free"},
+    {"prefix": ["gpt"],                  "name": "OpenAI", "tier": "Paid",     "readme_tier": "Paid"},
+    {"prefix": ["claude"],               "name": "Anthropic Claude", "tier": "Paid", "readme_tier": "Paid"},
+    {"prefix": ["mistral"],              "name": "Mistral", "tier": "Paid",    "readme_tier": "Paid"},
+    {"prefix": ["gemini"],               "name": "Google Gemini", "tier": "Free Tier", "readme_tier": "Free tier"},
+]
+
+def get_provider(model_id):
+    for p in PROVIDERS:
+        if any(model_id.startswith(px) for px in p["prefix"]):
+            return p
+    return None
+
+provider_count = len(set(get_provider(m)["name"] for m in model_ids if get_provider(m)))
+
+# ── Build CLAUDE.md model tables ──
+
+claude_tables = ""
+grouped = {}
+for mid, label in zip(model_ids, model_labels):
+    prov = get_provider(mid)
+    if not prov:
+        continue
+    key = prov["name"]
+    if key not in grouped:
+        grouped[key] = {"provider": prov, "models": []}
+    # Strip provider prefix from label (e.g. "Groq: Llama 4 Maverick (Free)" -> "Llama 4 Maverick (Free)")
+    short_label = label.split(": ", 1)[-1] if ": " in label else label
+    grouped[key]["models"].append((mid, short_label, tokens.get(mid, 4096)))
+
+for prov in PROVIDERS:
+    key = prov["name"]
+    if key not in grouped:
+        continue
+    claude_tables += f'### {key} ({prov["tier"]})\n'
+    claude_tables += "| Model ID | Label | Max Tokens |\n"
+    claude_tables += "|----------|-------|------------|\n"
+    for mid, label, tok in grouped[key]["models"]:
+        claude_tables += f"| `{mid}` | {label} | {tok} |\n"
+    claude_tables += "\n"
+
+claude_tables = claude_tables.rstrip("\n")
+
+# ── Build README model table ──
+
+readme_rows = ""
+for prov in PROVIDERS:
+    key = prov["name"]
+    if key not in grouped:
+        continue
+    models_str = ", ".join(label for _, label, _ in grouped[key]["models"])
+    display_name = key.replace("Anthropic Claude", "Anthropic").replace("Google Gemini", "Google")
+    readme_rows += f"| **{display_name}** | {models_str} | {prov['readme_tier']} |\n"
+
+readme_rows = readme_rows.rstrip("\n")
+
+# ── Update CLAUDE.md ──
+
+with open(CLAUDE_MD) as f:
+    claude = f.read()
+
+# Update overview model count
+claude = re.sub(
+    r'supports \d+ providers and \d+ models',
+    f'supports {provider_count} providers and {model_count} models',
+    claude
+)
+
+# Update MODEL_MAX_TOKENS count
+claude = re.sub(
+    r'per-model token limits \(\d+ models\)',
+    f'per-model token limits ({model_count} models)',
+    claude
+)
+
+# Replace model tables section
+claude = re.sub(
+    r'(## Supported Models\n\n).*?(\n## Code Architecture)',
+    r'\1' + claude_tables + r'\n\n\2',
+    claude,
+    flags=re.DOTALL
+)
+
+with open(CLAUDE_MD, "w") as f:
+    f.write(claude)
+
+# ── Update READMEs ──
+
+for readme_path in [README, BUNDLE_README]:
+    with open(readme_path) as f:
+        content = f.read()
+
+    # Update model count line
+    content = re.sub(
+        r'\d+ models across \d+ providers',
+        f'{model_count} models across {provider_count} providers',
+        content
+    )
+
+    # Replace model table
+    content = re.sub(
+        r'(\| Provider \| Models \| Pricing \|\n\|[-|]+\|\n).*?(\n\n)',
+        r'\1' + readme_rows + r'\n\n',
+        content,
+        flags=re.DOTALL
+    )
+
+    with open(readme_path, "w") as f:
+        f.write(content)
+
+print(f"  Models: {model_count} across {provider_count} providers")
+print(f"  CLAUDE.md    ✓")
+print(f"  README.md    ✓ (both copies)")
+PYEOF
+
+# ── Step 3: Build ZIP ────────────────────────────────────────────────
+
+echo ""
+echo "Step 3: Building $ZIP_NAME..."
 
 rm -f "$ZIP_NAME"
 
@@ -126,31 +280,31 @@ zip -rq "$ZIP_NAME" "$EXT_DIR" \
 ZIP_SIZE=$(du -h "$ZIP_NAME" | cut -f1)
 echo "  Created: $ZIP_NAME ($ZIP_SIZE)"
 
-# ── Step 3: Git commit + tag ─────────────────────────────────────────
+# ── Step 4: Git commit + tag ─────────────────────────────────────────
 
 echo ""
-echo "Step 3: Committing and tagging..."
+echo "Step 4: Committing and tagging..."
 
-git add "$CONFIG_FILE" "$PACKAGE_FILE"
+git add "$CONFIG_FILE" "$PACKAGE_FILE" CLAUDE.md README.md "$EXT_DIR/README.md"
 git commit -m "Release v$NEW_VERSION"
 git tag -a "v$NEW_VERSION" -m "Version $NEW_VERSION"
 
 echo "  Committed and tagged v$NEW_VERSION"
 
-# ── Step 4: Push ─────────────────────────────────────────────────────
+# ── Step 5: Push ─────────────────────────────────────────────────────
 
 echo ""
-echo "Step 4: Pushing to GitHub..."
+echo "Step 5: Pushing to GitHub..."
 
 git push origin main
 git push origin "v$NEW_VERSION"
 
 echo "  Pushed commit and tag"
 
-# ── Step 5: GitHub release ───────────────────────────────────────────
+# ── Step 6: GitHub release ───────────────────────────────────────────
 
 echo ""
-echo "Step 5: Creating GitHub release..."
+echo "Step 6: Creating GitHub release..."
 
 # Collect commits since last tag
 PREV_TAG=$(git tag --sort=-v:refname | grep -v "v$NEW_VERSION" | head -1)
@@ -182,10 +336,10 @@ rm -f "$NOTES_FILE"
 
 echo "  Release created with $ZIP_NAME attached"
 
-# ── Step 6: Cleanup ──────────────────────────────────────────────────
+# ── Step 7: Cleanup ──────────────────────────────────────────────────
 
 echo ""
-echo "Step 6: Cleaning up..."
+echo "Step 7: Cleaning up..."
 
 rm -f "$ZIP_NAME"
 echo "  Removed $ZIP_NAME"
