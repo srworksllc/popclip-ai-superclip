@@ -48,8 +48,8 @@ popclip-ai-superclip/
 ### Groq (Free)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `meta-llama/llama-4-maverick-17b-128e-instruct` | Llama 4 Maverick (Default) | 8192 |
-| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
+| `meta-llama/llama-4-maverick-17b-128e-instruct` | Llama 4 Maverick (Free) | 8192 |
+| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout (Free) | 8192 |
 
 ### OpenAI (Paid)
 | Model ID | Label | Max Tokens |
@@ -74,6 +74,7 @@ popclip-ai-superclip/
 |----------|-------|------------|
 | `gemini-2.5-pro` | 2.5 Pro | 8192 |
 | `gemini-2.5-flash` | 2.5 Flash | 8192 |
+
 
 ## Code Architecture
 

@@ -1,6 +1,6 @@
 {
   "name": "AI SuperClip",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "icon": "symbol:brain",
   "identifier": "com.srworks.popclip.extension.ai-superclip",
   "description": "Send the selected text to your preferred LLM and pastes the response. Hold Shift (\u21e7) to copy the response to the clipboard.",
@@ -140,7 +140,7 @@
     {
       "identifier": "version-heading",
       "type": "heading",
-      "label": "Version 1.1.2 \u00b7 srworks.co"
+      "label": "Version 1.1.3 \u00b7 srworks.co"
     }
   ]
 }

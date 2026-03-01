@@ -40,11 +40,11 @@ Tone does not apply to Spelling & Grammar or Summarize.
 
 | Provider | Models | Pricing |
 |----------|--------|---------|
-| **Groq** | Llama 4 Maverick (default), Llama 4 Scout | Free |
+| **Groq** | Llama 4 Maverick (Free), Llama 4 Scout (Free) | Free |
 | **OpenAI** | GPT-4.1, GPT-4.1 Mini | Paid |
-| **Anthropic** | Claude Sonnet 4.6, Claude Haiku 4.5 | Paid |
-| **Mistral** | Large | Paid |
-| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | Free tier |
+| **Anthropic** | Sonnet 4.6, Haiku 4.5 (Fast) | Paid |
+| **Mistral** | Medium, Small (Fast) | Paid |
+| **Google** | 2.5 Pro, 2.5 Flash | Free tier |
 
 ## Requirements
 
