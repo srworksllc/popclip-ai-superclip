@@ -89,7 +89,7 @@ with open('$CONFIG_FILE', 'r') as f:
 config['version'] = '$NEW_VERSION'
 for opt in config.get('options', []):
     if opt.get('identifier') == 'version-heading':
-        opt['label'] = 'Version $NEW_VERSION'
+        opt['label'] = 'Version $NEW_VERSION · srworks.co'
 with open('$CONFIG_FILE', 'w') as f:
     json.dump(config, f, indent=2)
     f.write('\n')
