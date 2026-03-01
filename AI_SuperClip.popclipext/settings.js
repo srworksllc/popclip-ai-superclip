@@ -18,35 +18,36 @@ const RETRY_DELAY_MS = 500;
 
 // Model-specific max_tokens configuration
 const MODEL_MAX_TOKENS = {
-  // Groq (free, fast)
+  // Groq (free)
   "meta-llama/llama-4-maverick-17b-128e-instruct": 8192,
   "meta-llama/llama-4-scout-17b-16e-instruct": 8192,
-  "llama-3.3-70b-versatile": 8192,
-  "llama-3.1-8b-instant": 8192,
   // OpenAI
   "gpt-4.1": 8192,
   "gpt-4.1-mini": 8192,
-  "gpt-4.1-nano": 8192,
-  "o3": 16384,
-  "o4-mini": 16384,
   // Claude
-  "claude-opus-4-6": 8192,
   "claude-sonnet-4-6": 8192,
   "claude-haiku-4-5-20251001": 8192,
   // Mistral
   "mistral-large-latest": 8192,
-  "mistral-medium-latest": 4096,
-  "mistral-small-latest": 4096,
   // Gemini
-  "gemini-3.1-pro-preview": 8192,
-  "gemini-3-flash-preview": 8192,
   "gemini-2.5-pro": 8192,
-  "gemini-2.5-flash": 8192,
-  "gemini-2.5-flash-lite": 4096
+  "gemini-2.5-flash": 8192
 };
 
 // Default max_tokens if model not in config
 const DEFAULT_MAX_TOKENS = 4096;
+
+// Tone instructions (injected into writing prompts when not "default")
+const TONES = {
+  default: "",
+  professional: "Use a professional tone, but still sound like a real person. Clear and precise, not stiff or corporate.",
+  casual: "Use a casual, relaxed tone. Write like you're talking to a friend.",
+  friendly: "Use a warm, friendly tone. Be approachable and natural, not overly enthusiastic or fake.",
+  direct: "Use a direct, no-nonsense tone. Cut to the point. Still sound like a person, not a robot."
+};
+
+// Actions that support tone injection
+const TONE_ACTIONS = ["improveWriting", "makeLonger", "makeShorter"];
 
 // Get max_tokens for a model
 function getMaxTokens(model) {
@@ -55,77 +56,70 @@ function getMaxTokens(model) {
 
 // Prompt templates for each action
 const PROMPTS = {
-  improveWriting: `Rewrite the text below to improve clarity, flow, and impact. Keep the original meaning intact.
+  improveWriting: `Rewrite the text below for clarity, flow, and impact. Keep the original meaning.
 
 RULES:
-1. Output ONLY the improved text. No preamble, no "Here's the improved version", no explanation.
-2. Start immediately with the first word of the rewritten content.
-3. NO markdown formatting. No bold, italics, headers, or bullet points.
-4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
-5. Only use hyphens for compound words like "well-known" or "high-quality".
-6. Match the original length approximately. Do not drastically shorten or lengthen.
-7. Preserve the author's voice. Make it clearer, not different.
-8. Write like a real person. Keep the tone natural, slightly casual, and conversational. Avoid stiff, corporate, or overly polished language. It should sound like someone actually wrote it, not like AI generated it.
-9. Prefer short, punchy sentences. Use contractions (don't, it's, won't). Avoid filler phrases and hedging words like "essentially", "basically", "in order to", "it should be noted that".
+1. Output ONLY the rewritten text. No preamble, no explanation, no commentary.
+2. NO markdown. No bold, italics, headers, or bullet points.
+3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+4. Match the original length. Don't shorten or lengthen significantly.
+5. Preserve the author's voice. Make it clearer, not different.
+6. Preserve paragraph breaks and line structure.
+7. Sound human. Use contractions and short sentences. Avoid filler words like "essentially", "basically", "in order to". It should read like a person wrote it, not AI.
 
-TEXT TO IMPROVE:`,
+TEXT:`,
 
-  correctSpellingGrammar: `Fix all spelling, grammar, and capitalization errors in the text below. Do not change the meaning, style, or tone.
+  correctSpellingGrammar: `Fix spelling, grammar, and capitalization errors in the text below.
 
 RULES:
-1. Output ONLY the corrected text. No preamble, no "Here are the corrections", no explanation.
-2. Start immediately with the first word of the corrected content.
-3. NO markdown formatting. No bold, italics, headers, or bullet points.
-4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
-5. Only use hyphens for compound words like "well-known" or "high-quality".
-6. ONLY fix errors. Do not rephrase, reword, or "improve" the writing.
-7. If the text has no errors, return it exactly as provided.
-8. ALWAYS fix capitalization: capitalize the first word of every sentence, proper nouns, and "I". The input may be written in all lowercase. Correct it to standard English capitalization.
+1. Output ONLY the corrected text. No preamble, no explanation.
+2. NO markdown. No bold, italics, headers, or bullet points.
+3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+4. ONLY fix errors. Do not rephrase, reword, or rewrite anything.
+5. If the text has no errors, return it unchanged.
+6. Fix capitalization: first word of every sentence, proper nouns, and "I". Input may be all lowercase.
+7. Preserve paragraph breaks, line structure, and formatting.
+8. Do not modify code, URLs, file paths, variable names, or technical terms.
 
-TEXT TO CORRECT:`,
+TEXT:`,
 
-  summarize: `Summarize the text below. Extract the main ideas, key points, and any action items.
+  summarize: `Summarize the text below. Extract the main ideas, key points, and action items.
 
 RULES:
-1. Output ONLY the summary. No preamble, no "Here's a summary", no explanation.
-2. Start immediately with the first word of the summary.
-3. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
-4. Only use hyphens for compound words like "well-known" or "high-quality".
-5. Keep it concise. Aim for 20 to 30 percent of the original length.
-6. Use bullet points only if the content has multiple distinct topics or action items.
-7. Write in plain, objective language. No opinions or interpretations.
+1. Output ONLY the summary. No preamble, no explanation.
+2. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+3. Aim for 20 to 30 percent of the original length.
+4. Use bullet points if there are multiple distinct topics or action items. Otherwise use plain prose.
+5. Write in plain, objective language. No opinions or interpretations.
+6. For very short input (under 2 sentences), return the core point in one sentence.
 
-TEXT TO SUMMARIZE:`,
+TEXT:`,
 
   makeLonger: `Expand the text below with more detail, examples, or elaboration. Keep the same tone and message.
 
 RULES:
-1. Output ONLY the expanded text. No preamble, no "Here's the longer version", no explanation.
-2. Start immediately with the first word of the expanded content.
-3. NO markdown formatting. No bold, italics, headers, or bullet points.
-4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
-5. Only use hyphens for compound words like "well-known" or "high-quality".
-6. Add substance, not fluff. Include relevant details, examples, or context.
-7. Roughly double the length, but prioritize quality over hitting a word count.
-8. Maintain the original voice and style.
-9. Write like a real person. Keep the tone natural, slightly casual, and conversational. The expanded text should sound handwritten, not AI generated. Use contractions and short sentences where they fit.
+1. Output ONLY the expanded text. No preamble, no explanation.
+2. NO markdown. No bold, italics, headers, or bullet points.
+3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+4. Add substance, not fluff. Include relevant details, examples, or context. Don't repeat existing points in different words.
+5. Roughly double the length, but prioritize quality over word count.
+6. Preserve paragraph breaks and line structure. Add new paragraphs where natural.
+7. Sound human. Use contractions and short sentences. No AI-sounding language.
 
-TEXT TO EXPAND:`,
+TEXT:`,
 
   makeShorter: `Condense the text below to its essential points. Preserve the core message and tone.
 
 RULES:
-1. Output ONLY the condensed text. No preamble, no "Here's the shorter version", no explanation.
-2. Start immediately with the first word of the condensed content.
-3. NO markdown formatting. No bold, italics, headers, or bullet points.
-4. NO em dashes (—), en dashes (–), or semicolons (;). Use commas or periods instead.
-5. Only use hyphens for compound words like "well-known" or "high-quality".
-6. Cut filler words, redundancies, and unnecessary qualifiers.
-7. Aim for roughly half the original length, but keep all essential information.
-8. Do not lose important details or change the meaning.
-9. Keep it sounding natural and human. Use contractions. Favor direct, casual phrasing over formal or corporate language.
+1. Output ONLY the condensed text. No preamble, no explanation.
+2. NO markdown. No bold, italics, headers, or bullet points.
+3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+4. Cut filler words, redundancies, and unnecessary qualifiers.
+5. Aim for roughly half the original length, but keep all essential information.
+6. Preserve paragraph breaks where the original has them.
+7. Sound human. Use contractions and direct phrasing.
 
-TEXT TO CONDENSE:`
+TEXT:`
 };
 
 // Handle response based on modifier keys
@@ -186,7 +180,7 @@ function isGroqModel(model) {
 async function callLLMapi(prompt, options) {
   if (isGroqModel(options.model)) {
     return await callGroqAPI(prompt, options);
-  } else if (options.model.startsWith("gpt") || options.model.startsWith("o3") || options.model.startsWith("o4")) {
+  } else if (options.model.startsWith("gpt")) {
     return await callOpenAPI(prompt, options);
   } else if (options.model.startsWith("claude")) {
     return await callClaudeAPI(prompt, options);
@@ -285,20 +279,13 @@ async function callOpenAPI(prompt, options) {
     throw new Error("Settings error: missing OpenAI API key");
   }
 
-  const isReasoning = options.model.startsWith("o3") || options.model.startsWith("o4");
-  const body = {
-    model: options.model,
-    messages: [{ role: "user", content: prompt }]
-  };
-  if (isReasoning) {
-    body.max_completion_tokens = getMaxTokens(options.model);
-  } else {
-    body.max_tokens = getMaxTokens(options.model);
-  }
-
   const { data } = await axios.post(
     "https://api.openai.com/v1/chat/completions",
-    body,
+    {
+      model: options.model,
+      max_tokens: getMaxTokens(options.model),
+      messages: [{ role: "user", content: prompt }]
+    },
     {
       timeout: REQUEST_TIMEOUT,
       headers: {
@@ -371,7 +358,18 @@ async function callGeminiAPI(prompt, options) {
 // Generic action runner with error handling and retry
 async function runAction(promptKey, input, options) {
   try {
-    const prompt = PROMPTS[promptKey] + "\n\n" + input.text.trim();
+    let prompt = PROMPTS[promptKey];
+
+    // Inject tone instruction for writing actions when not default
+    const tone = options.tone || "default";
+    if (tone !== "default" && TONE_ACTIONS.includes(promptKey)) {
+      const toneInstruction = TONES[tone];
+      if (toneInstruction) {
+        prompt += "\n" + toneInstruction;
+      }
+    }
+
+    prompt += "\n\n" + input.text.trim();
 
     // Use retry wrapper
     const apiFunction = async (p, o) => callLLMapi(p, o);

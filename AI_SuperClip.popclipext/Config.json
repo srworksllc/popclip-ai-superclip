@@ -55,46 +55,44 @@
       "values": [
         "meta-llama/llama-4-maverick-17b-128e-instruct",
         "meta-llama/llama-4-scout-17b-16e-instruct",
-        "llama-3.3-70b-versatile",
-        "llama-3.1-8b-instant",
         "gpt-4.1",
         "gpt-4.1-mini",
-        "gpt-4.1-nano",
-        "o3",
-        "o4-mini",
-        "claude-opus-4-6",
         "claude-sonnet-4-6",
         "claude-haiku-4-5-20251001",
         "mistral-large-latest",
-        "mistral-medium-latest",
-        "mistral-small-latest",
-        "gemini-3.1-pro-preview",
-        "gemini-3-flash-preview",
         "gemini-2.5-pro",
-        "gemini-2.5-flash",
-        "gemini-2.5-flash-lite"
+        "gemini-2.5-flash"
       ],
       "valueLabels": [
         "Groq: Llama 4 Maverick (Free)",
         "Groq: Llama 4 Scout (Free)",
-        "Groq: Llama 3.3 70B (Free)",
-        "Groq: Llama 3.1 8B (Free, Fast)",
         "OpenAI: GPT-4.1",
         "OpenAI: GPT-4.1 Mini",
-        "OpenAI: GPT-4.1 Nano",
-        "OpenAI: o3 (Reasoning)",
-        "OpenAI: o4 Mini (Reasoning)",
-        "Claude: Opus 4.6 (Best)",
         "Claude: Sonnet 4.6",
         "Claude: Haiku 4.5 (Fast)",
-        "Mistral: Large 3",
-        "Mistral: Medium 3",
-        "Mistral: Small 3",
-        "Gemini: 3.1 Pro (Preview)",
-        "Gemini: 3 Flash (Preview)",
+        "Mistral: Large",
         "Gemini: 2.5 Pro",
-        "Gemini: 2.5 Flash",
-        "Gemini: 2.5 Flash Lite"
+        "Gemini: 2.5 Flash"
+      ]
+    },
+    {
+      "identifier": "tone",
+      "label": "Tone",
+      "type": "multiple",
+      "defaultValue": "default",
+      "values": [
+        "default",
+        "professional",
+        "casual",
+        "friendly",
+        "direct"
+      ],
+      "valueLabels": [
+        "Default",
+        "Professional",
+        "Casual",
+        "Friendly",
+        "Direct"
       ]
     },
     {

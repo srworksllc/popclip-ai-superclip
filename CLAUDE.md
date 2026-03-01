@@ -11,7 +11,7 @@
 
 ## Overview
 
-AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 20 models, with Groq's Llama 4 Maverick as the default.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 9 models, with Groq's Llama 4 Maverick as the default.
 
 **Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
 **License:** MIT
@@ -50,40 +50,29 @@ popclip-ai-superclip/
 |----------|-------|------------|
 | `meta-llama/llama-4-maverick-17b-128e-instruct` | Llama 4 Maverick (Default) | 8192 |
 | `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
-| `llama-3.3-70b-versatile` | Llama 3.3 70B | 8192 |
-| `llama-3.1-8b-instant` | Llama 3.1 8B (Fast) | 8192 |
 
 ### OpenAI (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
 | `gpt-4.1` | GPT-4.1 | 8192 |
 | `gpt-4.1-mini` | GPT-4.1 Mini | 8192 |
-| `gpt-4.1-nano` | GPT-4.1 Nano | 8192 |
-| `o3` | o3 (Reasoning) | 16384 |
-| `o4-mini` | o4 Mini (Reasoning) | 16384 |
 
 ### Anthropic Claude (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `claude-opus-4-6` | Opus 4.6 (Best) | 8192 |
 | `claude-sonnet-4-6` | Sonnet 4.6 | 8192 |
 | `claude-haiku-4-5-20251001` | Haiku 4.5 (Fast) | 8192 |
 
 ### Mistral (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `mistral-large-latest` | Large 3 | 8192 |
-| `mistral-medium-latest` | Medium 3 | 4096 |
-| `mistral-small-latest` | Small 3 | 4096 |
+| `mistral-large-latest` | Large | 8192 |
 
 ### Google Gemini (Free Tier)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `gemini-3.1-pro-preview` | 3.1 Pro (Preview) | 8192 |
-| `gemini-3-flash-preview` | 3 Flash (Preview) | 8192 |
 | `gemini-2.5-pro` | 2.5 Pro | 8192 |
 | `gemini-2.5-flash` | 2.5 Flash | 8192 |
-| `gemini-2.5-flash-lite` | 2.5 Flash Lite | 4096 |
 
 ## Code Architecture
 
@@ -91,16 +80,16 @@ popclip-ai-superclip/
 
 ```
 Lines 1-10      Header and imports (axios)
-Lines 12-56     Configuration constants
+Lines 12-43     Configuration constants
                 - REQUEST_TIMEOUT: 60000ms
                 - MAX_RETRIES: 2
                 - RETRY_DELAY_MS: 500
-                - MODEL_MAX_TOKENS: per-model token limits
+                - MODEL_MAX_TOKENS: per-model token limits (9 models)
                 - getMaxTokens(): helper function
 
-Lines 58-126    PROMPTS object (5 prompt templates)
+Lines 45-111    PROMPTS object (5 prompt templates)
 
-Lines 128-175   Utility functions
+Lines 113-165   Utility functions
                 - prepareResponse(): paste or copy based on Shift
                 - sleep(): delay for retries
                 - isRateLimitError(): check for 429
@@ -108,23 +97,23 @@ Lines 128-175   Utility functions
                 - getErrorMessage(): user-friendly messages
                 - isGroqModel(): check if Groq model
 
-Lines 177-224   API routing and retry logic
+Lines 167-209   API routing and retry logic
                 - callLLMapi(): routes to correct provider
                 - callWithRetry(): exponential backoff wrapper
 
-Lines 226-359   Provider API functions
+Lines 211-344   Provider API functions
                 - callGroqAPI(): Groq (OpenAI-compatible)
                 - callClaudeAPI(): Anthropic
                 - callOpenAPI(): OpenAI
                 - callMistralAPI(): Mistral
                 - callGeminiAPI(): Google Gemini
 
-Lines 361-406   Action handlers
+Lines 346-391   Action handlers
                 - runAction(): generic with error handling
                 - improveWriting(), spellingAndGrammar(),
                   summarize(), makeLonger(), makeShorter()
 
-Lines 408-439   exports.actions array
+Lines 393-424   exports.actions array
 ```
 
 ### API Endpoints
@@ -161,12 +150,13 @@ Lines 408-439   exports.actions array
 
 All prompts follow consistent rules:
 1. Output ONLY the result (no preamble, explanations)
-2. Start immediately with first word of content
-3. NO markdown formatting (bold, italics, headers, bullets)
-4. NO em dashes, en dashes, or semicolons
-5. Only hyphens for compound words (well-known, high-quality)
-6. Writing prompts (Improve, Make Longer, Make Shorter) enforce a natural, casual, human tone with contractions and short sentences
-7. Spelling & Grammar prompt also fixes capitalization (lowercase input → proper English capitalization)
+2. NO markdown formatting (bold, italics, headers, bullets) — except Summarize allows bullet points for multi-topic content
+3. NO em dashes, en dashes, or semicolons. Hyphens only for compound words
+4. Preserve paragraph breaks and line structure
+5. Writing prompts (Improve, Make Longer, Make Shorter) enforce a natural, human tone with contractions and short sentences
+6. Spelling & Grammar fixes capitalization and protects code, URLs, file paths, and technical terms from modification
+7. Summarize handles short input (under 2 sentences) gracefully with a one-sentence summary
+8. Tone injection: When tone is not "default", a tone instruction is appended after the prompt rules for writing actions only (Improve, Make Longer, Make Shorter). Does NOT apply to Spelling & Grammar or Summarize.
 
 ## Config.json Structure
 
@@ -180,6 +170,7 @@ All prompts follow consistent rules:
 | `mistralapikey` | secret | Mistral API key |
 | `geminiapikey` | secret | Google Gemini API key |
 | `model` | multiple | Model selection dropdown |
+| `tone` | multiple | Tone selection (default, professional, casual, friendly, direct) |
 | `enable-improve-writing` | boolean | Toggle Improve Writing action |
 | `enable-spelling-grammar` | boolean | Toggle Spelling & Grammar action |
 | `enable-make-longer` | boolean | Toggle Make Longer action |
