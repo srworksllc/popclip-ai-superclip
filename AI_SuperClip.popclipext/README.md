@@ -2,7 +2,7 @@
 
 A PopClip extension that enhances your selected text using AI. Select text, click an action, and get instant results.
 
-**Created by Steve Reinhardt | [SR Works LLC](https://srworks.co)**
+**Created by Steve Reinhardt | [SRWorks LLC](https://srworks.co)**
 
 ## Features
 
@@ -24,13 +24,13 @@ A PopClip extension that enhances your selected text using AI. Select text, clic
 
 | Provider | Models | Pricing |
 |----------|--------|---------|
-| **Groq** | Llama 3.3 70B, Llama 3.1 8B, Mixtral 8x7B, Gemma 2 9B | Free |
-| **OpenAI** | GPT-5.2, GPT-5.1, GPT-4.1, GPT-4.1 Mini, GPT-4o, GPT-4o Mini | Paid |
-| **Anthropic** | Claude Opus 4.5, Sonnet 4.5, Sonnet 4, Haiku 4.5 | Paid |
-| **Mistral** | Large 3, Medium 3, Small 3 | Paid |
-| **Google** | Gemini 3 Flash, 3 Pro, 2.5 Pro, 2.5 Flash | Free tier |
+| **Groq** | Llama 4 Maverick, Llama 4 Scout | Free |
+| **OpenAI** | GPT-4.1, GPT-4.1 Mini | Paid |
+| **Anthropic** | Claude Sonnet 4.6, Haiku 4.5 | Paid |
+| **Mistral** | Large | Paid |
+| **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | Free tier |
 
-**Default:** Groq Llama 3.3 70B (free, high quality)
+**Default:** Groq Llama 4 Maverick (free, high quality)
 
 ## Requirements
 
@@ -80,4 +80,4 @@ View logs in **Console.app** with filter: `Process:PopClip Category:Extension`
 
 ## License
 
-MIT License - Copyright (c) 2025 Steve Reinhardt, SR Works LLC
+MIT License - Copyright (c) 2026 Steve Reinhardt, SRWorks LLC
