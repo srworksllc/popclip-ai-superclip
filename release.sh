@@ -162,10 +162,8 @@ if [ -z "$RELEASE_NOTES" ]; then
   RELEASE_NOTES="- Bug fixes and improvements"
 fi
 
-gh release create "v$NEW_VERSION" "$ZIP_NAME" \
-  --repo "$GITHUB_REPO" \
-  --title "AI SuperClip v$NEW_VERSION" \
-  --notes "$(cat <<EOF
+NOTES_FILE=$(mktemp)
+cat > "$NOTES_FILE" <<EOF
 ## What's Changed
 
 $RELEASE_NOTES
@@ -174,7 +172,13 @@ $RELEASE_NOTES
 
 Download \`$ZIP_NAME\` and double-click to install in PopClip.
 EOF
-)"
+
+gh release create "v$NEW_VERSION" "$ZIP_NAME" \
+  --repo "$GITHUB_REPO" \
+  --title "AI SuperClip v$NEW_VERSION" \
+  --notes-file "$NOTES_FILE"
+
+rm -f "$NOTES_FILE"
 
 echo "  Release created with $ZIP_NAME attached"
 
