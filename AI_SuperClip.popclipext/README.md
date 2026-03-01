@@ -14,23 +14,37 @@ A PopClip extension that enhances your selected text using AI. Select text, clic
 | **Make Shorter** | Condense to essential points |
 | **Summarize** | Extract key points and action items |
 
-**Additional:**
+### Tone
+
+Choose a writing tone that applies to Improve Writing, Make Longer, and Make Shorter:
+
+| Tone | Description |
+|------|-------------|
+| **Default** | No tone adjustment — uses the AI model's natural response |
+| **Professional** | Polished and business-appropriate |
+| **Casual** | Relaxed and conversational |
+| **Friendly** | Warm and approachable |
+| **Direct** | Concise and to the point |
+
+Tone does not apply to Spelling & Grammar or Summarize.
+
+### Additional
+
 - Hold **Shift** to copy result instead of pasting
 - Plain text output (no markdown or special formatting)
 - Automatic retry on network errors
-- Toggle actions on/off in settings
+- Toggle individual actions on/off in settings
+- 9 models across 5 providers — switch anytime in settings
 
-## Supported Providers
+## Supported Models
 
 | Provider | Models | Pricing |
 |----------|--------|---------|
-| **Groq** | Llama 4 Maverick, Llama 4 Scout | Free |
+| **Groq** | Llama 4 Maverick (default), Llama 4 Scout | Free |
 | **OpenAI** | GPT-4.1, GPT-4.1 Mini | Paid |
-| **Anthropic** | Claude Sonnet 4.6, Haiku 4.5 | Paid |
+| **Anthropic** | Claude Sonnet 4.6, Claude Haiku 4.5 | Paid |
 | **Mistral** | Large | Paid |
 | **Google** | Gemini 2.5 Pro, Gemini 2.5 Flash | Free tier |
-
-**Default:** Groq Llama 4 Maverick (free, high quality)
 
 ## Requirements
 
