@@ -223,8 +223,8 @@ async function callWithRetry(apiFunction, prompt, options) {
 
 // --- GROQ API (Free, OpenAI-compatible)
 async function callGroqAPI(prompt, options) {
-  const key = options.groqapikey.trim();
-  if (!key || key.length === 0) {
+  const key = (options.groqapikey || "").trim();
+  if (!key) {
     throw new Error("Settings error: missing Groq API key. Get a free key at console.groq.com");
   }
 
@@ -248,8 +248,8 @@ async function callGroqAPI(prompt, options) {
 
 // --- CLAUDE API
 async function callClaudeAPI(prompt, options) {
-  const key = options.claudeapikey.trim();
-  if (!key || key.length === 0) {
+  const key = (options.claudeapikey || "").trim();
+  if (!key) {
     throw new Error("Settings error: missing Claude API key");
   }
 
@@ -275,8 +275,8 @@ async function callClaudeAPI(prompt, options) {
 
 // --- OPENAI API
 async function callOpenAPI(prompt, options) {
-  const key = options.apikey.trim();
-  if (!key || key.length === 0) {
+  const key = (options.apikey || "").trim();
+  if (!key) {
     throw new Error("Settings error: missing OpenAI API key");
   }
 
@@ -299,8 +299,8 @@ async function callOpenAPI(prompt, options) {
 
 // --- MISTRAL API
 async function callMistralAPI(prompt, options) {
-  const key = options.mistralapikey.trim();
-  if (!key || key.length === 0) {
+  const key = (options.mistralapikey || "").trim();
+  if (!key) {
     throw new Error("Settings error: missing Mistral API key");
   }
 
@@ -325,8 +325,8 @@ async function callMistralAPI(prompt, options) {
 
 // --- GEMINI API
 async function callGeminiAPI(prompt, options) {
-  const key = options.geminiapikey.trim();
-  if (!key || key.length === 0) {
+  const key = (options.geminiapikey || "").trim();
+  if (!key) {
     throw new Error("Settings error: missing Gemini API key");
   }
 
@@ -349,11 +349,13 @@ async function callGeminiAPI(prompt, options) {
     }
   );
 
-  if (!data || !data.candidates || !data.candidates[0]) {
-    throw new Error("Gemini API error: Invalid response");
+  const candidate = data && data.candidates && data.candidates[0];
+  if (!candidate || !candidate.content || !candidate.content.parts || !candidate.content.parts[0]) {
+    const reason = candidate && candidate.finishReason || "unknown";
+    throw new Error("Gemini returned no content (finishReason: " + reason + ")");
   }
 
-  return data.candidates[0].content.parts[0].text.trim();
+  return candidate.content.parts[0].text.trim();
 }
 
 // Generic action runner with error handling and retry

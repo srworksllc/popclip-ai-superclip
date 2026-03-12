@@ -20,31 +20,31 @@
     {
       "identifier": "groqapikey",
       "label": "Groq (Free)",
-      "type": "secret",
+      "type": "string",
       "description": "console.groq.com/keys"
     },
     {
       "identifier": "apikey",
       "label": "OpenAI",
-      "type": "secret",
+      "type": "string",
       "description": "platform.openai.com/api-keys"
     },
     {
       "identifier": "claudeapikey",
       "label": "Anthropic Claude",
-      "type": "secret",
+      "type": "string",
       "description": "console.anthropic.com/settings/keys"
     },
     {
       "identifier": "mistralapikey",
       "label": "Mistral",
-      "type": "secret",
+      "type": "string",
       "description": "console.mistral.ai/api-keys"
     },
     {
       "identifier": "geminiapikey",
       "label": "Google Gemini",
-      "type": "secret",
+      "type": "string",
       "description": "ai.google.dev"
     },
     {
