@@ -148,7 +148,7 @@ for mid in model_ids:
 # ── Provider grouping (order matters) ──
 
 PROVIDERS = [
-    {"prefix": ["meta-llama/", "llama"], "name": "Groq", "tier": "Free",      "readme_tier": "Free"},
+    {"prefix": ["meta-llama/", "llama", "openai/gpt-oss"], "name": "Groq", "tier": "Paid", "readme_tier": "Paid"},
     {"prefix": ["gpt"],                  "name": "OpenAI", "tier": "Paid",     "readme_tier": "Paid"},
     {"prefix": ["claude"],               "name": "Anthropic Claude", "tier": "Paid", "readme_tier": "Paid"},
     {"prefix": ["mistral"],              "name": "Mistral", "tier": "Paid",    "readme_tier": "Paid"},

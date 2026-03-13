@@ -11,7 +11,7 @@
 
 ## Overview
 
-AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 10 models, with Groq's Llama 4 Maverick as the default.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 10 models, with Groq's GPT-OSS 120B as the default.
 
 **Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
 **License:** MIT

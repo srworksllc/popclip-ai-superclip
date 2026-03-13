@@ -18,8 +18,8 @@ const RETRY_DELAY_MS = 500;
 
 // Model-specific max_tokens configuration
 const MODEL_MAX_TOKENS = {
-  // Groq (free)
-  "meta-llama/llama-4-maverick-17b-128e-instruct": 8192,
+  // Groq
+  "openai/gpt-oss-120b": 8192,
   "meta-llama/llama-4-scout-17b-16e-instruct": 8192,
   // OpenAI
   "gpt-4.1": 8192,
@@ -174,7 +174,7 @@ function getErrorMessage(error) {
 
 // Check if model is a Groq model
 function isGroqModel(model) {
-  return model.startsWith("llama") || model.startsWith("meta-llama/");
+  return model.startsWith("llama") || model.startsWith("meta-llama/") || model.startsWith("openai/gpt-oss");
 }
 
 // Route to appropriate API based on model

@@ -19,7 +19,7 @@
     },
     {
       "identifier": "groqapikey",
-      "label": "Groq (Free)",
+      "label": "Groq",
       "type": "string",
       "description": "console.groq.com/keys"
     },
@@ -51,9 +51,9 @@
       "identifier": "model",
       "label": "Model",
       "type": "multiple",
-      "defaultValue": "meta-llama/llama-4-maverick-17b-128e-instruct",
+      "defaultValue": "openai/gpt-oss-120b",
       "values": [
-        "meta-llama/llama-4-maverick-17b-128e-instruct",
+        "openai/gpt-oss-120b",
         "meta-llama/llama-4-scout-17b-16e-instruct",
         "gpt-4.1",
         "gpt-4.1-mini",
@@ -65,8 +65,8 @@
         "gemini-2.5-flash"
       ],
       "valueLabels": [
-        "Groq: Llama 4 Maverick (Free)",
-        "Groq: Llama 4 Scout (Free)",
+        "Groq: GPT-OSS 120B",
+        "Groq: Llama 4 Scout",
         "OpenAI: GPT-4.1",
         "OpenAI: GPT-4.1 Mini",
         "Claude: Sonnet 4.6",
