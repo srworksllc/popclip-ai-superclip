@@ -60,7 +60,7 @@ const PROMPTS = {
   improveWriting: `Rewrite the text below for clarity, flow, and impact. Keep the original meaning.
 
 RULES:
-1. Output ONLY the rewritten text. No preamble, no explanation, no commentary.
+1. Output ONLY the rewritten text. No preamble, no explanation, no commentary. Do not wrap output in quotes.
 2. NO markdown. No bold, italics, headers, or bullet points.
 3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
 4. Match the original length. Don't shorten or lengthen significantly.
@@ -73,7 +73,7 @@ TEXT:`,
   correctSpellingGrammar: `Fix spelling, grammar, and capitalization errors in the text below.
 
 RULES:
-1. Output ONLY the corrected text. No preamble, no explanation.
+1. Output ONLY the corrected text. No preamble, no explanation. Do not wrap output in quotes.
 2. NO markdown. No bold, italics, headers, or bullet points.
 3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
 4. ONLY fix errors. Do not rephrase, reword, or rewrite anything.
@@ -87,10 +87,10 @@ TEXT:`,
   summarize: `Summarize the text below. Extract the main ideas, key points, and action items.
 
 RULES:
-1. Output ONLY the summary. No preamble, no explanation.
-2. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
-3. Aim for 20 to 30 percent of the original length.
-4. Use bullet points if there are multiple distinct topics or action items. Otherwise use plain prose.
+1. Output ONLY the summary. No preamble, no explanation. Do not wrap output in quotes.
+2. NO markdown formatting (bold, italics, headers). Bullet points are allowed for multiple topics.
+3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
+4. Aim for 20 to 30 percent of the original length.
 5. Write in plain, objective language. No opinions or interpretations.
 6. For very short input (under 2 sentences), return the core point in one sentence.
 
@@ -99,10 +99,10 @@ TEXT:`,
   makeLonger: `Expand the text below with more detail, examples, or elaboration. Keep the same tone and message.
 
 RULES:
-1. Output ONLY the expanded text. No preamble, no explanation.
+1. Output ONLY the expanded text. No preamble, no explanation. Do not wrap output in quotes.
 2. NO markdown. No bold, italics, headers, or bullet points.
 3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
-4. Add substance, not fluff. Include relevant details, examples, or context. Don't repeat existing points in different words.
+4. Add substance, not fluff. Include relevant details, examples, or context. Don't repeat existing points in different words. Do not add a concluding paragraph that restates what was already said.
 5. Roughly double the length, but prioritize quality over word count.
 6. Preserve paragraph breaks and line structure. Add new paragraphs where natural.
 7. Sound human. Use contractions and short sentences. No AI-sounding language.
@@ -112,10 +112,10 @@ TEXT:`,
   makeShorter: `Condense the text below to its essential points. Preserve the core message and tone.
 
 RULES:
-1. Output ONLY the condensed text. No preamble, no explanation.
+1. Output ONLY the condensed text. No preamble, no explanation. Do not wrap output in quotes.
 2. NO markdown. No bold, italics, headers, or bullet points.
 3. NO em dashes, en dashes, or semicolons. Use commas or periods instead. Hyphens only for compound words.
-4. Cut filler words, redundancies, and unnecessary qualifiers.
+4. Cut filler words, redundancies, and unnecessary qualifiers. Do not add a summary sentence that wasn't in the original.
 5. Aim for roughly half the original length, but keep all essential information.
 6. Preserve paragraph breaks where the original has them.
 7. Sound human. Use contractions and direct phrasing.
@@ -368,7 +368,7 @@ async function runAction(promptKey, input, options) {
     if (tone !== "default" && TONE_ACTIONS.includes(promptKey)) {
       const toneInstruction = TONES[tone];
       if (toneInstruction) {
-        prompt += "\n" + toneInstruction;
+        prompt = prompt.replace(/\nTEXT:$/, "\n" + toneInstruction + "\n\nTEXT:");
       }
     }
 
