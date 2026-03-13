@@ -51,9 +51,9 @@
       "identifier": "model",
       "label": "Model",
       "type": "multiple",
-      "defaultValue": "openai/gpt-oss-120b",
+      "defaultValue": "llama-3.3-70b-versatile",
       "values": [
-        "openai/gpt-oss-120b",
+        "llama-3.3-70b-versatile",
         "meta-llama/llama-4-scout-17b-16e-instruct",
         "gpt-4.1",
         "gpt-4.1-mini",
@@ -65,7 +65,7 @@
         "gemini-2.5-flash"
       ],
       "valueLabels": [
-        "Groq: GPT-OSS 120B",
+        "Groq: Llama 3.3 70B",
         "Groq: Llama 4 Scout",
         "OpenAI: GPT-4.1",
         "OpenAI: GPT-4.1 Mini",
