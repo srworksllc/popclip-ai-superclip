@@ -45,11 +45,11 @@ popclip-ai-superclip/
 
 ## Supported Models
 
-### Groq (Free)
+### Groq (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `meta-llama/llama-4-maverick-17b-128e-instruct` | Llama 4 Maverick (Free) | 8192 |
-| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout (Free) | 8192 |
+| `openai/gpt-oss-120b` | GPT-OSS 120B | 8192 |
+| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
 
 ### OpenAI (Paid)
 | Model ID | Label | Max Tokens |
