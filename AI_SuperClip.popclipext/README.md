@@ -40,7 +40,7 @@ Tone does not apply to Spelling & Grammar or Summarize.
 
 | Provider | Models | Pricing |
 |----------|--------|---------|
-| **Groq** | GPT-OSS 120B, Llama 4 Scout | Paid |
+| **Groq** | Llama 3.3 70B, Llama 4 Scout | Paid |
 | **OpenAI** | GPT-4.1, GPT-4.1 Mini | Paid |
 | **Anthropic** | Sonnet 4.6, Haiku 4.5 (Fast) | Paid |
 | **Mistral** | Medium, Small (Fast) | Paid |

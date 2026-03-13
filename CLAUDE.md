@@ -48,7 +48,7 @@ popclip-ai-superclip/
 ### Groq (Paid)
 | Model ID | Label | Max Tokens |
 |----------|-------|------------|
-| `openai/gpt-oss-120b` | GPT-OSS 120B | 8192 |
+| `llama-3.3-70b-versatile` | Llama 3.3 70B | 8192 |
 | `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
 
 ### OpenAI (Paid)
