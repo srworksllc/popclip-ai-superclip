@@ -34,17 +34,18 @@ Tone does not apply to Spelling & Grammar or Summarize.
 - Plain text output (no markdown or special formatting)
 - Automatic retry on network errors
 - Toggle individual actions on/off in settings
-- 10 models across 5 providers — switch anytime in settings
+- 4 providers — switch anytime in settings
 
-## Supported Models
+## Supported Providers
 
-| Provider | Models | Pricing |
-|----------|--------|---------|
-| **Groq** | Llama 3.3 70B, Llama 4 Scout | Paid |
-| **OpenAI** | GPT-4.1, GPT-4.1 Mini | Paid |
-| **Anthropic** | Sonnet 4.6, Haiku 4.5 (Fast) | Paid |
-| **Mistral** | Medium, Small (Fast) | Paid |
-| **Google** | 2.5 Pro, 2.5 Flash | Free tier |
+Pick a provider in settings. The extension always uses each provider's current flagship model.
+
+| Provider | Model | Pricing |
+|----------|-------|---------|
+| **Groq** | Llama 3.3 70B | Free |
+| **OpenAI** | GPT-5.5 | Paid |
+| **Anthropic** | Claude Sonnet 4.6 | Paid |
+| **Mistral** | Mistral Large 3 | Paid |
 
 ## Requirements
 
@@ -70,7 +71,6 @@ Open PopClip menu bar icon, then click the gear on AI SuperClip.
 | OpenAI | [platform.openai.com/api-keys](https://platform.openai.com/api-keys) |
 | Anthropic | [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) |
 | Mistral | [console.mistral.ai/api-keys](https://console.mistral.ai/api-keys) |
-| Google Gemini | [ai.google.dev](https://ai.google.dev) |
 
 Only enter a key for your selected provider.
 

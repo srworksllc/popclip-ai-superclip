@@ -16,27 +16,16 @@ const REQUEST_TIMEOUT = 60000;
 const MAX_RETRIES = 2;
 const RETRY_DELAY_MS = 500;
 
-// Model-specific max_tokens configuration
-const MODEL_MAX_TOKENS = {
-  // Groq
-  "llama-3.3-70b-versatile": 8192,
-  "meta-llama/llama-4-scout-17b-16e-instruct": 8192,
-  // OpenAI
-  "gpt-4.1": 8192,
-  "gpt-4.1-mini": 8192,
-  // Claude
-  "claude-sonnet-4-6": 8192,
-  "claude-haiku-4-5-20251001": 8192,
-  // Mistral
-  "mistral-medium-latest": 8192,
-  "mistral-small-latest": 8192,
-  // Gemini
-  "gemini-2.5-pro": 8192,
-  "gemini-2.5-flash": 8192
+// Provider → current model name. Update here when a provider releases a new flagship.
+// Last verified: May 2026
+const PROVIDER_MODELS = {
+  groq: "llama-3.3-70b-versatile",
+  openai: "gpt-5.5",
+  claude: "claude-sonnet-4-6",
+  mistral: "mistral-large-latest"
 };
 
-// Default max_tokens if model not in config
-const DEFAULT_MAX_TOKENS = 4096;
+const MAX_TOKENS = 2048;
 
 // Tone instructions (injected into writing prompts when not "default")
 const TONES = {
@@ -49,11 +38,6 @@ const TONES = {
 
 // Actions that support tone injection
 const TONE_ACTIONS = ["improveWriting", "makeLonger", "makeShorter"];
-
-// Get max_tokens for a model
-function getMaxTokens(model) {
-  return MODEL_MAX_TOKENS[model] || DEFAULT_MAX_TOKENS;
-}
 
 // Prompt templates for each action
 const PROMPTS = {
@@ -172,25 +156,16 @@ function getErrorMessage(error) {
   return error.message || "An unexpected error occurred.";
 }
 
-// Check if model is a Groq model
-function isGroqModel(model) {
-  return model.startsWith("llama") || model.startsWith("meta-llama/");
-}
-
-// Route to appropriate API based on model
+// Route to appropriate API based on selected provider
 async function callLLMapi(prompt, options) {
-  if (isGroqModel(options.model)) {
-    return await callGroqAPI(prompt, options);
-  } else if (options.model.startsWith("gpt")) {
-    return await callOpenAPI(prompt, options);
-  } else if (options.model.startsWith("claude")) {
-    return await callClaudeAPI(prompt, options);
-  } else if (options.model.startsWith("mistral")) {
-    return await callMistralAPI(prompt, options);
-  } else if (options.model.startsWith("gemini")) {
-    return await callGeminiAPI(prompt, options);
+  const provider = options.model || "groq";
+  switch (provider) {
+    case "groq":    return await callGroqAPI(prompt, options);
+    case "openai":  return await callOpenAPI(prompt, options);
+    case "claude":  return await callClaudeAPI(prompt, options);
+    case "mistral": return await callMistralAPI(prompt, options);
   }
-  throw new Error("Unknown model selection: " + options.model);
+  throw new Error("Unknown provider: " + provider);
 }
 
 // Wrapper with retry logic
@@ -231,8 +206,8 @@ async function callGroqAPI(prompt, options) {
   const { data } = await axios.post(
     "https://api.groq.com/openai/v1/chat/completions",
     {
-      model: options.model,
-      max_tokens: getMaxTokens(options.model),
+      model: PROVIDER_MODELS.groq,
+      max_tokens: MAX_TOKENS,
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -256,8 +231,8 @@ async function callClaudeAPI(prompt, options) {
   const { data } = await axios.post(
     "https://api.anthropic.com/v1/messages",
     {
-      model: options.model,
-      max_tokens: getMaxTokens(options.model),
+      model: PROVIDER_MODELS.claude,
+      max_tokens: MAX_TOKENS,
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -283,8 +258,8 @@ async function callOpenAPI(prompt, options) {
   const { data } = await axios.post(
     "https://api.openai.com/v1/chat/completions",
     {
-      model: options.model,
-      max_tokens: getMaxTokens(options.model),
+      model: PROVIDER_MODELS.openai,
+      max_tokens: MAX_TOKENS,
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -307,8 +282,8 @@ async function callMistralAPI(prompt, options) {
   const { data } = await axios.post(
     "https://api.mistral.ai/v1/chat/completions",
     {
-      model: options.model,
-      max_tokens: getMaxTokens(options.model),
+      model: PROVIDER_MODELS.mistral,
+      max_tokens: MAX_TOKENS,
       messages: [{ role: "user", content: prompt }]
     },
     {
@@ -321,41 +296,6 @@ async function callMistralAPI(prompt, options) {
     }
   );
   return data.choices[0].message.content.trim();
-}
-
-// --- GEMINI API
-async function callGeminiAPI(prompt, options) {
-  const key = (options.geminiapikey || "").trim();
-  if (!key) {
-    throw new Error("Settings error: missing Gemini API key");
-  }
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${options.model}:generateContent?key=${key}`;
-
-  const { data } = await axios.post(
-    url,
-    {
-      contents: [{
-        role: "user",
-        parts: [{ text: prompt }]
-      }],
-      generationConfig: {
-        maxOutputTokens: getMaxTokens(options.model)
-      }
-    },
-    {
-      timeout: REQUEST_TIMEOUT,
-      headers: { "Content-Type": "application/json" }
-    }
-  );
-
-  const candidate = data && data.candidates && data.candidates[0];
-  if (!candidate || !candidate.content || !candidate.content.parts || !candidate.content.parts[0]) {
-    const reason = candidate && candidate.finishReason || "unknown";
-    throw new Error("Gemini returned no content (finishReason: " + reason + ")");
-  }
-
-  return candidate.content.parts[0].text.trim();
 }
 
 // Generic action runner with error handling and retry

@@ -11,7 +11,7 @@
 
 ## Overview
 
-AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 5 providers and 10 models, with Groq's Llama 3.3 70B as the default.
+AI SuperClip is a PopClip extension for macOS that enhances selected text using AI language models. It supports 4 providers, with Groq's Llama 3.3 70B as the default. Each provider exposes one curated flagship model — the dropdown selects the provider, and the actual model ID is resolved from `PROVIDER_MODELS` in `settings.js`.
 
 **Author:** Steve Reinhardt | SR Works LLC | https://srworks.co
 **License:** MIT
@@ -45,78 +45,32 @@ popclip-ai-superclip/
 
 ## Supported Models
 
-### Groq (Paid)
-| Model ID | Label | Max Tokens |
-|----------|-------|------------|
-| `llama-3.3-70b-versatile` | Llama 3.3 70B | 8192 |
-| `meta-llama/llama-4-scout-17b-16e-instruct` | Llama 4 Scout | 8192 |
+The dropdown stores provider keys (`groq`, `openai`, `claude`, `mistral`). The actual model ID sent to each provider is resolved at call time from `PROVIDER_MODELS` in `settings.js`. This means model upgrades require editing one constant — no Config.json changes, no doc churn from snapshot model IDs.
 
-### OpenAI (Paid)
-| Model ID | Label | Max Tokens |
-|----------|-------|------------|
-| `gpt-4.1` | GPT-4.1 | 8192 |
-| `gpt-4.1-mini` | GPT-4.1 Mini | 8192 |
+| Provider | Dropdown Key | Current Model ID | Last Verified |
+|----------|--------------|------------------|---------------|
+| Groq | `groq` | `llama-3.3-70b-versatile` | May 2026 |
+| OpenAI | `openai` | `gpt-5.5` | May 2026 |
+| Anthropic Claude | `claude` | `claude-sonnet-4-6` | May 2026 |
+| Mistral | `mistral` | `mistral-large-latest` | May 2026 |
 
-### Anthropic Claude (Paid)
-| Model ID | Label | Max Tokens |
-|----------|-------|------------|
-| `claude-sonnet-4-6` | Sonnet 4.6 | 8192 |
-| `claude-haiku-4-5-20251001` | Haiku 4.5 (Fast) | 8192 |
-
-### Mistral (Paid)
-| Model ID | Label | Max Tokens |
-|----------|-------|------------|
-| `mistral-medium-latest` | Medium | 8192 |
-| `mistral-small-latest` | Small (Fast) | 8192 |
-
-### Google Gemini (Free Tier)
-| Model ID | Label | Max Tokens |
-|----------|-------|------------|
-| `gemini-2.5-pro` | 2.5 Pro | 8192 |
-| `gemini-2.5-flash` | 2.5 Flash | 8192 |
+`MAX_TOKENS` is a single constant (currently `2048`). It applies to all providers. The value is intentionally low to keep requests inside Groq free-tier rate limits (12K TPM) — Groq counts the reserved `max_tokens` against the budget whether the response uses them or not.
 
 
 ## Code Architecture
 
 ### settings.js Structure
 
-```
-Lines 1-10      Header and imports (axios)
-Lines 12-43     Configuration constants
-                - REQUEST_TIMEOUT: 60000ms
-                - MAX_RETRIES: 2
-                - RETRY_DELAY_MS: 500
-                - MODEL_MAX_TOKENS: per-model token limits (10 models)
-                - getMaxTokens(): helper function
-
-Lines 45-111    PROMPTS object (5 prompt templates)
-
-Lines 113-165   Utility functions
-                - prepareResponse(): paste or copy based on Shift
-                - sleep(): delay for retries
-                - isRateLimitError(): check for 429
-                - isRetryableError(): network/5xx/429
-                - getErrorMessage(): user-friendly messages
-                - isGroqModel(): check if Groq model
-
-Lines 167-209   API routing and retry logic
-                - callLLMapi(): routes to correct provider
-                - callWithRetry(): exponential backoff wrapper
-
-Lines 211-344   Provider API functions
-                - callGroqAPI(): Groq (OpenAI-compatible)
-                - callClaudeAPI(): Anthropic
-                - callOpenAPI(): OpenAI
-                - callMistralAPI(): Mistral
-                - callGeminiAPI(): Google Gemini
-
-Lines 346-391   Action handlers
-                - runAction(): generic with error handling
-                - improveWriting(), spellingAndGrammar(),
-                  summarize(), makeLonger(), makeShorter()
-
-Lines 393-424   exports.actions array
-```
+- Header and imports (`axios`)
+- Configuration constants: `REQUEST_TIMEOUT` (60s), `MAX_RETRIES` (2), `RETRY_DELAY_MS` (500), `PROVIDER_MODELS` (provider→model map), `MAX_TOKENS` (2048)
+- `TONES` map and `TONE_ACTIONS` list — tone instructions injected into writing prompts when not "default"
+- `PROMPTS` object — 5 prompt templates (improveWriting, correctSpellingGrammar, summarize, makeLonger, makeShorter)
+- Utility functions: `prepareResponse()` (paste vs copy on Shift), `sleep()`, `isRateLimitError()`, `isRetryableError()`, `getErrorMessage()`
+- `callLLMapi()` — switch on provider key, routes to provider-specific function
+- `callWithRetry()` — exponential backoff wrapper
+- Provider functions: `callGroqAPI`, `callOpenAPI`, `callClaudeAPI`, `callMistralAPI` — each looks up its model via `PROVIDER_MODELS[<key>]`
+- Action handlers: `runAction()` generic dispatcher + the 5 thin action wrappers
+- `exports.actions` array — PopClip action declarations
 
 ### API Endpoints
 
@@ -126,7 +80,6 @@ Lines 393-424   exports.actions array
 | OpenAI | `https://api.openai.com/v1/chat/completions` |
 | Claude | `https://api.anthropic.com/v1/messages` |
 | Mistral | `https://api.mistral.ai/v1/chat/completions` |
-| Gemini | `https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent` |
 
 ### Error Handling
 
@@ -170,8 +123,7 @@ All prompts follow consistent rules:
 | `apikey` | secret | OpenAI API key |
 | `claudeapikey` | secret | Anthropic API key |
 | `mistralapikey` | secret | Mistral API key |
-| `geminiapikey` | secret | Google Gemini API key |
-| `model` | multiple | Model selection dropdown |
+| `model` | multiple | Provider key (`groq`, `openai`, `claude`, `mistral`) |
 | `tone` | multiple | Tone selection (default, professional, casual, friendly, direct) |
 | `enable-improve-writing` | boolean | Toggle Improve Writing action |
 | `enable-spelling-grammar` | boolean | Toggle Spelling & Grammar action |
@@ -196,14 +148,18 @@ Requires text selection AND the toggle option enabled.
 3. Add to `exports.actions` array with title, icon, code, requirements
 4. Add toggle option in Config.json with `identifier`, `label`, `type: boolean`, `defaultValue: true`
 
-### Add a New Model
+### Update a Provider's Model
 
-1. Add model ID to `values` array in Config.json model option
-2. Add label to `valueLabels` array (same index)
-3. Add token limit to `MODEL_MAX_TOKENS` in settings.js
-4. If new provider: add API key option, implement `callXxxAPI()`, update `callLLMapi()` router, add provider to `PROVIDERS` list in release.sh doc sync
+When a provider releases a new flagship, edit one line in `PROVIDER_MODELS` in `settings.js`. No Config.json edits needed. After updating, manually refresh the "Current Model ID" row in the Supported Models table above (the release script does not auto-sync this, by design — model labels are too short and reviewer-facing to derive from API IDs reliably).
 
-CLAUDE.md and README.md model tables/counts are auto-synced from Config.json at release time (Step 2 of release.sh).
+### Add a New Provider
+
+1. Add the provider key to `PROVIDER_MODELS` in `settings.js`
+2. Implement `callXxxAPI()`
+3. Add the provider to the `switch` in `callLLMapi()`
+4. Add an API key option to `Config.json`
+5. Add the provider key + label to the `model` dropdown's `values` and `valueLabels` arrays in `Config.json`
+6. Add a row to the Supported Models table above
 
 ### Update a Prompt
 
@@ -223,18 +179,17 @@ Edit the relevant key in `PROMPTS` object. Follow existing structure:
 | Step | Action |
 |------|--------|
 | 1 | Version bump (Config.json, package.json) |
-| 2 | Sync docs — auto-updates model tables/counts in CLAUDE.md and README.md (both copies) from Config.json + settings.js |
+| 2 | Sync docs — refreshes the provider count and the "Current Model ID" column in CLAUDE.md and READMEs from `PROVIDER_MODELS` in settings.js |
 | 3 | Build ZIP (`.popclipextz`) |
 | 4 | Git commit + tag (includes Config.json, package.json, CLAUDE.md, README.md x2) |
 | 5 | Push to GitHub |
 | 6 | Create GitHub release with ZIP attached |
 | 7 | Cleanup (remove local ZIP) |
 
-**Doc sync (Step 2) auto-updates:**
-- Model count in CLAUDE.md overview and code architecture section
-- Full model tables in CLAUDE.md (grouped by provider with token limits)
-- Model count and summary table in both READMEs
-- Provider grouping is defined in the `PROVIDERS` list inside release.sh
+**Doc sync (Step 2):**
+- Reads `PROVIDER_MODELS` from `settings.js` (single source of truth for model IDs)
+- Updates the provider count in CLAUDE.md overview and READMEs
+- Hand-written human labels (e.g. "Llama 3.3 70B", "GPT-5.5") are NOT auto-derived from API IDs — update them manually when the model line in `PROVIDER_MODELS` changes
 
 ## Debugging
 

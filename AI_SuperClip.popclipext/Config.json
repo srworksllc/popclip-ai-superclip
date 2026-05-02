@@ -42,39 +42,21 @@
       "description": "console.mistral.ai/api-keys"
     },
     {
-      "identifier": "geminiapikey",
-      "label": "Google Gemini",
-      "type": "string",
-      "description": "ai.google.dev"
-    },
-    {
       "identifier": "model",
-      "label": "Model",
+      "label": "Provider",
       "type": "multiple",
-      "defaultValue": "llama-3.3-70b-versatile",
+      "defaultValue": "groq",
       "values": [
-        "llama-3.3-70b-versatile",
-        "meta-llama/llama-4-scout-17b-16e-instruct",
-        "gpt-4.1",
-        "gpt-4.1-mini",
-        "claude-sonnet-4-6",
-        "claude-haiku-4-5-20251001",
-        "mistral-medium-latest",
-        "mistral-small-latest",
-        "gemini-2.5-pro",
-        "gemini-2.5-flash"
+        "groq",
+        "openai",
+        "claude",
+        "mistral"
       ],
       "valueLabels": [
-        "Groq: Llama 3.3 70B",
-        "Groq: Llama 4 Scout",
-        "OpenAI: GPT-4.1",
-        "OpenAI: GPT-4.1 Mini",
-        "Claude: Sonnet 4.6",
-        "Claude: Haiku 4.5 (Fast)",
-        "Mistral: Medium",
-        "Mistral: Small (Fast)",
-        "Gemini: 2.5 Pro",
-        "Gemini: 2.5 Flash"
+        "Groq (Free, Fast)",
+        "OpenAI",
+        "Anthropic Claude",
+        "Mistral"
       ]
     },
     {
