@@ -22,7 +22,7 @@ const PROVIDER_MODELS = {
   groq: "llama-3.3-70b-versatile",
   openai: "gpt-5.5",
   claude: "claude-sonnet-4-6",
-  mistral: "mistral-large-latest"
+  mistral: "mistral-medium-latest"
 };
 
 const MAX_TOKENS = 2048;

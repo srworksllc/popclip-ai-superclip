@@ -45,7 +45,7 @@ Pick a provider in settings. The extension always uses each provider's current f
 | **Groq** | Llama 3.3 70B | Free |
 | **OpenAI** | GPT-5.5 | Paid |
 | **Anthropic** | Claude Sonnet 4.6 | Paid |
-| **Mistral** | Mistral Large 3 | Paid |
+| **Mistral** | Mistral Medium 3.5 | Paid |
 
 ## Requirements
 

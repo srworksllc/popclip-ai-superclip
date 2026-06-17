@@ -49,10 +49,10 @@ The dropdown stores provider keys (`groq`, `openai`, `claude`, `mistral`). The a
 
 | Provider | Dropdown Key | Current Model ID | Last Verified |
 |----------|--------------|------------------|---------------|
-| Groq | `groq` | `llama-3.3-70b-versatile` | May 2026 |
-| OpenAI | `openai` | `gpt-5.5` | May 2026 |
-| Anthropic Claude | `claude` | `claude-sonnet-4-6` | May 2026 |
-| Mistral | `mistral` | `mistral-large-latest` | May 2026 |
+| Groq | `groq` | `llama-3.3-70b-versatile` | Jun 2026 |
+| OpenAI | `openai` | `gpt-5.5` | Jun 2026 |
+| Anthropic Claude | `claude` | `claude-sonnet-4-6` | Jun 2026 |
+| Mistral | `mistral` | `mistral-medium-latest` | Jun 2026 |
 
 `MAX_TOKENS` is a single constant (currently `2048`). It applies to all providers. The value is intentionally low to keep requests inside Groq free-tier rate limits (12K TPM) — Groq counts the reserved `max_tokens` against the budget whether the response uses them or not.
 
